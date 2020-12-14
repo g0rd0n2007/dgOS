@@ -26,6 +26,7 @@ void ShutDown(){
 
   // Set  touchscreen sleep
   ttgo->displaySleep();
+  setCpuFrequencyMhz(5);
   
 #ifdef LILYGO_WATCH_2020_V1
     ttgo->powerOff();

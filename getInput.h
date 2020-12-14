@@ -11,12 +11,7 @@
 #define DigitBG 0x01AE
 #define DigitFG 0xFFFF
 
-#define ButtonOK_FG 0xFFFF
-#define ButtonOK_BG 0x255F
-#define ButtonCancel_FG 0xFFFF
-#define ButtonCancel_BG 0xD3E0
-#define ButtonNo_FG 0xFFFF
-#define ButtonNo_BG 0x8800
+
 
 String BPLUS_NONE[] = {"", "", "", ""};
 String BPLUS_HOUR[] = {":", "", "", ""};

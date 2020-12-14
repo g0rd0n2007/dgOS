@@ -11,6 +11,7 @@ Timer drawT;
 uint32_t Now;
 boolean irqAPX202 = false, irqRTC = false;
 
+#include "icons.h"
 #include "displayTime.h"
 #include "displayBattery.h"
 #include "sleepMode.h"
@@ -175,10 +176,11 @@ void loop()
         if(SleepMode){
           WakeUp(Now);
         }else{
+          ttgo->power->clearIRQ();
           StartLowPowerMode();
         }
       }
-      ttgo->power->clearIRQ();
+      ttgo->power->clearIRQ();      
     }
     if(ttgo->rtc->alarmActive()){
       irqRTC = false;

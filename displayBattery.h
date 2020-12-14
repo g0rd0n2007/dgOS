@@ -24,11 +24,14 @@ void displayBattery(){
 
 void displayAlarm(){
   AlarmActive = ttgo->rtc->isAlarmEnabled();
-    
-  if(AlarmActive) ttgo->tft->setTextColor(TFT_WHITE);
+
+
+  ttgo->tft->drawXBitmap(150, 10, alarmIcon, 16, 16, (AlarmActive)? TFT_WHITE : 0x3186, TFT_BLACK);
+   
+  /*if(AlarmActive) ttgo->tft->setTextColor(TFT_WHITE);
   else ttgo->tft->setTextColor(0x3186);
   
   ttgo->tft->setTextDatum(TC_DATUM);
   ttgo->tft->setFreeFont(FSS9);
-  ttgo->tft->drawString("Alm", 150, 10, GFXFF);  
+  ttgo->tft->drawString("Alm", 150, 10, GFXFF); */ 
 }

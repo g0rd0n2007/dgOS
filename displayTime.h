@@ -42,7 +42,7 @@ void displayTime() {
   ttgo->tft->drawString(txt, 120, 60, GFXFF);
   
   sprintf(txt, "%02d/%02d/%04d", dday, mmonth, yyear);
-  ttgo->tft->setTextColor(0x94B2);
+  //ttgo->tft->setTextColor(0x94B2);
   ttgo->tft->setFreeFont(FSS12);
   ttgo->tft->drawString(txt, 120, 130, GFXFF);
 
