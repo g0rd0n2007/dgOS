@@ -15,7 +15,8 @@
 
 String BPLUS_NONE[] = {"", "", "", ""};
 String BPLUS_HOUR[] = {":", "", "", ""};
-String BPLUS_DATE[] = {".", "", "", ""};
+String BPLUS_DATE[] = {"/", "", "", ""};
+String BPLUS_ALFA[] = {"", "", "Caps", "1aA"};
 
 /*void DrawTXT(TTGOClass *ttgo, String *TXT, boolean Cursor = true){
     ttgo->tft->setTextColor(DigitFG, DigitBG);
@@ -30,6 +31,77 @@ String BPLUS_DATE[] = {".", "", "", ""};
       ttgo->tft->drawFastHLine(9 + ttgo->tft->textWidth(*TXT), 70, 5, DigitFG);
     }
 }*/
+
+void StrQuickAdd(String *t, String chars, int q_idx, int max_len){
+  
+  if(q_idx == 0 && chars.length() > 0 && t->length() < max_len) *t = *t + chars[0];
+  else {
+    for(int i=1; i<9 && i<chars.length(); i++){
+      if(q_idx == i) {
+        t->setCharAt(t->length() - 1, chars[i]);
+        return;
+      }
+    }
+  }
+  
+            /*case 1: TXT->setCharAt(TXT->length() - 1, 'q'); break;
+            case 2: TXT->setCharAt(TXT->length() - 1, 'w'); break;
+            case 3: TXT->setCharAt(TXT->length() - 1, 'e'); break;
+          }*/
+}
+
+void getInput_T2M(int Mode, cButton _b[]){
+  switch(Mode){
+            case 0:
+              _b[0].Text = "0"; 
+              _b[1].Text = "1"; 
+              _b[2].Text = "2"; 
+              _b[3].Text = "3"; 
+              _b[4].Text = "4"; 
+              _b[5].Text = "5"; 
+              _b[6].Text = "6"; 
+              _b[7].Text = "7"; 
+              _b[8].Text = "8"; 
+              _b[9].Text = "9";
+              break;
+            case 1:
+              _b[0].Text = "_"; 
+              _b[1].Text = "qwe"; 
+              _b[2].Text = "rtyu"; 
+              _b[3].Text = "iop"; 
+              _b[4].Text = "asd"; 
+              _b[5].Text = "fgh"; 
+              _b[6].Text = "jkl"; 
+              _b[7].Text = "zx"; 
+              _b[8].Text = "cvb"; 
+              _b[9].Text = "nm";
+              break;
+            case 2:
+              _b[0].Text = "_"; 
+              _b[1].Text = "QWE"; 
+              _b[2].Text = "RTYU"; 
+              _b[3].Text = "IOP"; 
+              _b[4].Text = "ASD"; 
+              _b[5].Text = "FGH"; 
+              _b[6].Text = "JKL"; 
+              _b[7].Text = "ZX"; 
+              _b[8].Text = "CVB"; 
+              _b[9].Text = "NM";
+              break;
+            case 3:
+              _b[0].Text = "_"; 
+              _b[1].Text = "."; 
+              _b[2].Text = ","; 
+              _b[3].Text = "()"; 
+              _b[4].Text = "[]"; 
+              _b[5].Text = ":;"; 
+              _b[6].Text = "-_"; 
+              _b[7].Text = "?"; 
+              _b[8].Text = "@"; 
+              _b[9].Text = "!";
+              break;
+          }
+}
   
 boolean getInput(TTGOClass *ttgo, String info, String *TXT, int max_length, String bplus[4]){
     Swipe s;
@@ -71,42 +143,96 @@ boolean getInput(TTGOClass *ttgo, String info, String *TXT, int max_length, Stri
     ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
     ttgo->tft->setFreeFont(FSS9);
     ttgo->tft->drawString(info, 10, 10, GFXFF);
+
+    int Mode = 0;
+    if(bplus[3] == "1aA") Mode = 1;
+    getInput_T2M(Mode, _b);
   
     for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false);  
-    Edit.Draw(ttgo);  
-    //CT.Set(millis(), 500);
-    //DrawTXT(ttgo, TXT, ShowCursor);
+    Edit.Draw(ttgo, 2);  
+    
   
     do{s.Run(ttgo, millis()); } while(s.Swiping);
     
     do{
       now = millis();
       s.Run(ttgo, now);
-      for(int i = 0; i < 17; i++) _b[i].Run(ttgo, s);
+      for(int i = 0; i < 17; i++) _b[i].Run(ttgo, s, now);
       Edit.Run(ttgo, s, now);
 
-      if(TXT->length() < max_length){ 
-        if(_b[0].IsPressed()) { *TXT = *TXT + "0"; Edit.Draw(ttgo); }
-        else if(_b[1].IsPressed()) { *TXT = *TXT + "1"; Edit.Draw(ttgo); }
-        else if(_b[2].IsPressed()) { *TXT = *TXT + "2"; Edit.Draw(ttgo); }
-        else if(_b[3].IsPressed()) { *TXT = *TXT + "3"; Edit.Draw(ttgo); }
-        else if(_b[4].IsPressed()) { *TXT = *TXT + "4"; Edit.Draw(ttgo); }
-        else if(_b[5].IsPressed()) { *TXT = *TXT + "5"; Edit.Draw(ttgo); }
-        else if(_b[6].IsPressed()) { *TXT = *TXT + "6"; Edit.Draw(ttgo); }
-        else if(_b[7].IsPressed()) { *TXT = *TXT + "7"; Edit.Draw(ttgo); }
-        else if(_b[8].IsPressed()) { *TXT = *TXT + "8"; Edit.Draw(ttgo); }
-        else if(_b[9].IsPressed()) { *TXT = *TXT + "9"; Edit.Draw(ttgo); }
-        else if(_b[13].IsPressed()) { *TXT = *TXT + _b[13].Text; Edit.Draw(ttgo); }
-        else if(_b[14].IsPressed()) { *TXT = *TXT + _b[14].Text; Edit.Draw(ttgo); }
-        else if(_b[15].IsPressed()) { *TXT = *TXT + _b[15].Text; Edit.Draw(ttgo); }
-        else if(_b[16].IsPressed()) { *TXT = *TXT + _b[16].Text; Edit.Draw(ttgo); }
+      
+      if(_b[0].IsPressed()) { 
+          String buf = _b[0].Text;
+          buf.replace("_", " ");
+          StrQuickAdd(TXT, buf, _b[0].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
       }
+      else if(_b[1].IsPressed()) { 
+          StrQuickAdd(TXT, _b[1].Text, _b[1].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[2].IsPressed()) { 
+          StrQuickAdd(TXT, _b[2].Text, _b[2].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[3].IsPressed()) { 
+          StrQuickAdd(TXT, _b[3].Text, _b[3].GetQuickPressIdx(), max_length); 
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[4].IsPressed()) { 
+          StrQuickAdd(TXT, _b[4].Text, _b[4].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[5].IsPressed()) { 
+          StrQuickAdd(TXT, _b[5].Text, _b[5].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[6].IsPressed()) { 
+          StrQuickAdd(TXT, _b[6].Text, _b[6].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[7].IsPressed()) { 
+          StrQuickAdd(TXT, _b[7].Text, _b[7].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[8].IsPressed()) { 
+          StrQuickAdd(TXT, _b[8].Text, _b[8].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[9].IsPressed()) { 
+          StrQuickAdd(TXT, _b[9].Text, _b[9].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[13].IsPressed()) { 
+          StrQuickAdd(TXT, _b[13].Text, _b[13].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[14].IsPressed()) { 
+          StrQuickAdd(TXT, _b[14].Text, _b[14].GetQuickPressIdx(), max_length);
+          Edit.Draw(ttgo, 2); 
+      }
+      else if(_b[15].IsPressed() && _b[15].Text == "Caps") {
+          if(Mode == 1) Mode = 2;
+          else if(Mode == 2) Mode = 1;
+
+          getInput_T2M(Mode, _b);
+          for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false); 
+      }        
+            
       if(TXT->length() > 0) {
         if(_b[12].IsPressed()){//backspace
           TXT->remove(TXT->length() - 1, 1); 
-          Edit.Draw(ttgo);        
+          Edit.Draw(ttgo, 2);        
         }
-      }      
+      }
+      if(_b[16].IsPressed() && _b[16].Text == "1aA") { 
+          if(Mode == 0) Mode = 1;
+          else if(Mode == 1 || Mode == 2) Mode = 3;
+          else if(Mode == 3) Mode = 0;
+
+          getInput_T2M(Mode, _b);
+          for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false);
+      }
     }while(!_b[10].IsReleased() && !_b[11].IsReleased());
 
     do{s.Run(ttgo, millis()); } while(s.Swiping);
@@ -179,15 +305,15 @@ int MessageBox(TTGOClass *ttgo, String caption, String message, uint8_t DC){
       s.Run(ttgo, now);
       
       if(DC == Dialog_OK || DC == Dialog_OK_Cancel || DC == Dialog_OK_No_Cancel || DC == Dialog_OK_No){
-        bOK.Run(ttgo, s);
+        bOK.Run(ttgo, s, now);
         if(bOK.IsReleased()) break;
       }
       if(DC == Dialog_OK_Cancel || DC == Dialog_OK_No_Cancel){
-        bCancel.Run(ttgo, s);
+        bCancel.Run(ttgo, s, now);
         if(bCancel.IsReleased()) break;
       }
       if(DC == Dialog_OK_No_Cancel || DC == Dialog_OK_No){
-        bNo.Run(ttgo, s);
+        bNo.Run(ttgo, s, now);
         if(bNo.IsReleased()) break;
       }
     }while(1);

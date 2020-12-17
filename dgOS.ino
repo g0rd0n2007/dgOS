@@ -23,7 +23,7 @@ boolean irqAPX202 = false, irqRTC = false;
 #include "menu.h"
 
 
-cButton cMenu = cButton(5, 205, ButtonWidth, ButtonHeight, "Menu");
+cButton cMenu = cButton(85, 205, 70, ButtonHeight, "Menu");
 Swipe S;
 
 void S_Release(){
@@ -33,25 +33,28 @@ void S_Release(){
 boolean S_Timeout(Swipe *s, uint32_t t){
   if((s->CatchTime + 1000) < t){
     if(s->CatchInRect(0, 40, 240, 80)){  
-      String a = String(hh), b = String(mm);
+      String a;
+      char buf[10];
 
-      if(getInput(ttgo, "Ustawianie godziny:", &a, 2, BPLUS_NONE) && getInput(ttgo, "Ustawianie minuty:", &b, 2, BPLUS_NONE)){
-        hh = a.toInt();
-        mm = b.toInt();
+      sprintf(buf, "%d:%02d", hh, mm);
+      a = String(buf);
+      
+      if(getInput(ttgo, "Ustawianie godziny:", &a, 5, BPLUS_HOUR)){
+        sscanf(a.c_str(), "%d:%d", &hh, &mm);
         ttgo->rtc->setDateTime(yyear, mmonth, dday, hh, mm, 0);
       }
       sleepT.SetNext(millis());
       return true;
     }
     if(s->CatchInRect(0, 120, 240, 80)){
-      String a = String(dday);
-      String b = String(mmonth);
-      String c = String(yyear);
+      String a;
+      char buf[15];
 
-      if(getInput(ttgo, "Ustawianie dnia:", &a, 2, BPLUS_NONE) && getInput(ttgo, "Ustawianie miesiaca:", &b, 2, BPLUS_NONE) && getInput(ttgo, "Ustawianie roku:", &c, 4, BPLUS_NONE)){
-        dday = a.toInt();
-        mmonth = b.toInt();
-        yyear = c.toInt();
+      sprintf(buf, "%d/%d/%04d", dday, mmonth, yyear);
+      a = String(buf);
+
+      if(getInput(ttgo, "Ustawianie dnia:", &a, 10, BPLUS_DATE)){
+        sscanf(a.c_str(), "%d/%d/%d", &dday, &mmonth, &yyear);
         ttgo->rtc->setDateTime(yyear, mmonth, dday, hh, mm, ss);
       }
       sleepT.SetNext(millis());
@@ -70,12 +73,12 @@ void DrawDesktop(){
 }
 
 void setup()
-{
+{    
     ttgo = TTGOClass::getWatch();
     ttgo->begin();
 
 
-    esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+    /*esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
     switch(wakeup_reason)
     {
       case 4:
@@ -84,7 +87,7 @@ void setup()
         
         break;
       default: break;
-    }
+    }*/
 
     
     ttgo->openBL(); // Turn on the backlight
@@ -93,14 +96,14 @@ void setup()
     ttgo->power->adc1Enable(AXP202_VBUS_VOL_ADC1 | AXP202_VBUS_CUR_ADC1 | AXP202_BATT_CUR_ADC1 | AXP202_BATT_VOL_ADC1, true);
     //Przycisk
     pinMode(AXP202_INT, INPUT_PULLUP);
-    //pinMode(RTC_INT_PIN, INPUT_PULLUP);
+    pinMode(RTC_INT_PIN, INPUT_PULLUP);
     
     attachInterrupt(AXP202_INT, [] {
         irqAPX202 = true;
     }, FALLING);
-    /*attachInterrupt(RTC_INT_PIN, [] {
+    attachInterrupt(RTC_INT_PIN, [] {
         irqRTC = true;
-    }, FALLING);*/
+    }, FALLING);
     
     //!Clear IRQ unprocessed  first
     ttgo->power->enableIRQ(AXP202_PEK_SHORTPRESS_IRQ | AXP202_VBUS_REMOVED_IRQ | AXP202_VBUS_CONNECT_IRQ | AXP202_CHARGING_FINISHED_IRQ, true);
@@ -111,9 +114,10 @@ void setup()
     
     ttgo->rtc->check();
     ttgo->rtc->syncToSystem();
-    RTC_Alarm alm = ttgo->rtc->getAlarm();
-    alarm_hh = alm.hour;
-    alarm_mm = alm.minute;
+    //RTC_Alarm alm = ttgo->rtc->getAlarm();
+    //alarm_hh = alm.hour;
+    //alarm_mm = alm.minute;
+    ttgo->rtc->setAlarm(Alarm_hh[0], Alarm_mm[0], PCF8563_NO_ALARM, PCF8563_NO_ALARM, Alarm_Active[0]);
     AlarmActive = ttgo->rtc->isAlarmEnabled();
     
     Now = millis();
@@ -123,7 +127,7 @@ void setup()
     S.TimeOut = S_Timeout;
     
     DrawDesktop();
-    ttgo->motor->onec();
+    //ttgo->motor->onec();
     setCpuFrequencyMhz(40);
 }
 
@@ -133,7 +137,7 @@ void loop()
 
     if(!SleepMode){
       S.Run(ttgo, Now);
-      cMenu.Run(ttgo, S);
+      cMenu.Run(ttgo, S, Now);
 
       if(cMenu.IsReleased()){
         Menu(ttgo);
@@ -147,8 +151,9 @@ void loop()
       }
 
       if(sleepT.TON(Now)){
-        //Zasypiamy      
-        StartLowPowerMode();
+        //Zasypiamy              
+        StartLowPowerMode();   
+        ttgo->power->clearIRQ(); irqAPX202 = false;     
       }  
     }
     
@@ -208,7 +213,7 @@ void loop()
             ttgo->tft->fillScreen(TFT_WHITE);
             ttgo->tft->setTextColor(TFT_BLACK, TFT_WHITE); 
           }
-          ttgo->tft->drawString("Alarm", 120, 120, GFXFF);
+          ttgo->tft->drawString(CurAlmName, 120, 120, GFXFF);
           
           bo = !bo;          
         }
@@ -217,5 +222,6 @@ void loop()
       ttgo->tft->fillScreen(TFT_BLACK); 
       sleepT.SetNext(Now);
       drawT.TargetTime = 0;
+      TrySetNearestAlarm();
     }
 }

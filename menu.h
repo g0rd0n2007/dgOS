@@ -11,7 +11,7 @@ void Menu(TTGOClass *ttgo){
   Swipe s;
   uint32_t now;
   cButton _b[2] = {
-    cButton(100, 200, ButtonWidth, ButtonHeight, "Back", ButtonOK_FG, ButtonOK_BG),
+    cButton(85, 205, 70, ButtonHeight, "Wstecz", ButtonOK_FG, ButtonOK_BG),
     cButton(0, 50, ButtonWidth, ButtonHeight, "Alarm")
   };
   
@@ -23,7 +23,7 @@ void Menu(TTGOClass *ttgo){
   do{
     now = millis();
     s.Run(ttgo, now);
-    for(int i = 0; i < 2; i++) _b[i].Run(ttgo, s);
+    for(int i = 0; i < 2; i++) _b[i].Run(ttgo, s, now);
 
     if(_b[1].IsReleased()){
       AlarmPage(ttgo);

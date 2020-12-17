@@ -27,9 +27,11 @@ class cButton:cControl{
 private:
   ButtonState Pressed = BS_Idle;
   
+  
 public:
   String Text;
   uint16_t FG = TFT_WHITE, BG = 0xA514;  
+  uint32_t CatchTime[10] = {0, 0, 0, 0, 0};
     
   cButton(){};
 
@@ -37,7 +39,7 @@ public:
     X = x; Y = y; Width = w; Height = h; Text = txt; 
   }
 
-   cButton(int16_t x, int16_t y, int16_t w, int16_t h, String txt, uint16_t fg, uint16_t bg){
+  cButton(int16_t x, int16_t y, int16_t w, int16_t h, String txt, uint16_t fg, uint16_t bg){
     X = x; Y = y; Width = w; Height = h; Text = txt; FG = fg; BG = bg;
   }
   
@@ -59,11 +61,23 @@ public:
     ttgo->tft->drawString(Text, X + Width / 2, Y + Height / 2, GFXFF);
   }
 
-  void Run(TTGOClass *ttgo, Swipe s){
+  void Run(TTGOClass *ttgo, Swipe s, uint32_t now){
     switch(Pressed){
       case BS_Idle:
         if(s.Swiping && s.CatchInRect(X, Y, Width, Height)) { 
           Pressed = BS_Pressed;  
+
+          CatchTime[9] = CatchTime[8];
+          CatchTime[8] = CatchTime[7];
+          CatchTime[7] = CatchTime[6];
+          CatchTime[6] = CatchTime[5];
+          CatchTime[5] = CatchTime[4];
+          CatchTime[4] = CatchTime[3];
+          CatchTime[3] = CatchTime[2];
+          CatchTime[2] = CatchTime[1];
+          CatchTime[1] = CatchTime[0];
+          CatchTime[0] = now;
+          
           Draw(ttgo, true); 
         }
         break;
@@ -100,6 +114,20 @@ public:
   boolean IsReleased(){
     if(Pressed == BS_Released) return true;
     else return false;
+  }
+
+  uint8_t GetQuickPressIdx(){
+    #define QuickPressThresshold 700
+    
+    if((CatchTime[0] - CatchTime[1]) > QuickPressThresshold) return 0;
+    else if((CatchTime[1] - CatchTime[2]) > QuickPressThresshold) return 1;
+    else if((CatchTime[2] - CatchTime[3]) > QuickPressThresshold) return 2;
+    else if((CatchTime[3] - CatchTime[4]) > QuickPressThresshold) return 3;
+    else if((CatchTime[4] - CatchTime[5]) > QuickPressThresshold) return 4;
+    else if((CatchTime[5] - CatchTime[6]) > QuickPressThresshold) return 5;
+    else if((CatchTime[6] - CatchTime[7]) > QuickPressThresshold) return 6;
+    else if((CatchTime[7] - CatchTime[8]) > QuickPressThresshold) return 7;
+    else if((CatchTime[8] - CatchTime[9]) > QuickPressThresshold) return 8;
   }
 };
 
@@ -218,27 +246,34 @@ public:
     CT.Set(millis(), 500);
   }
   
-  void Draw(TTGOClass *ttgo){
-    ttgo->tft->setTextColor(FG, BG);
+  void Draw(TTGOClass *ttgo, int importance = 1){
+
     ttgo->tft->setFreeFont(FSS12);
     ttgo->tft->setTextDatum(TL_DATUM);
-    ttgo->tft->fillRoundRect(X, Y, Width, Height, 5, BG);
-    ttgo->tft->drawRoundRect(X, Y, Width, Height, 5, FG);
-    ttgo->tft->drawString(*Text, X + 10, Y + 5, GFXFF);
-    if(Blinks && Cursor) {
-      //String a;
       
-      //if(C_idx >= Text->length() - 1) a = Text->substring(0, C_idx);
-      ttgo->tft->drawFastHLine(X + 10 + ttgo->tft->textWidth(*Text), Y + 4, 3, FG);
-      ttgo->tft->drawFastVLine(X + 11 + ttgo->tft->textWidth(*Text), Y + 5, 20, FG);
-      ttgo->tft->drawFastHLine(X + 10 + ttgo->tft->textWidth(*Text), Y + 25, 3, FG);
+    if(importance > 1) {
+      ttgo->tft->setTextColor(FG, BG);      
+      ttgo->tft->fillRoundRect(X, Y, Width, Height, 5, BG);
+      ttgo->tft->drawRoundRect(X, Y, Width, Height, 5, FG);
+      ttgo->tft->drawString(*Text, X + 10, Y + 5, GFXFF);
+    }
+
+    int w = ttgo->tft->textWidth(*Text);
+    if(Blinks && Cursor) {
+      ttgo->tft->drawFastHLine(X + 10 + w, Y + 4, 3, FG);
+      ttgo->tft->drawFastVLine(X + 11 + w, Y + 5, 20, FG);
+      ttgo->tft->drawFastHLine(X + 10 + w, Y + 25, 3, FG);
+    }else if(Blinks && !Cursor) {
+      ttgo->tft->drawFastHLine(X + 10 + w, Y + 4, 3, BG);
+      ttgo->tft->drawFastVLine(X + 11 + w, Y + 5, 20, BG);
+      ttgo->tft->drawFastHLine(X + 10 + w, Y + 25, 3, BG);
     }
   }
 
   void Run(TTGOClass *ttgo, Swipe s, uint32_t t){
     if(CT.TON(t, true)){
       Cursor = !Cursor;
-      Draw(ttgo);
+      Draw(ttgo, 1);
     }
     
     switch(Pressed){

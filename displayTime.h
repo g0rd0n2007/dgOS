@@ -1,11 +1,16 @@
 #define TopBarHeight 40
 #define BottomBarHeight 40
+#define NO_OF_ALARMS 3
 
-uint16_t hh, mm, ss, mmonth, dday, dayOW; // H, M, S variables
-uint16_t yyear; // Year is 16 bit int
+int hh, mm, ss, mmonth, dday, dayOW; // H, M, S variables
+int yyear; // Year is 16 bit int
 
-static uint16_t alarm_hh = 7, alarm_mm = 0;
-static boolean AlarmActive = false;
+RTC_DATA_ATTR int Alarm_hh[NO_OF_ALARMS];
+RTC_DATA_ATTR int Alarm_mm[NO_OF_ALARMS];
+RTC_DATA_ATTR boolean Alarm_Active[NO_OF_ALARMS];
+RTC_DATA_ATTR String Alarm_Names[NO_OF_ALARMS];
+boolean AlarmActive = false;
+RTC_DATA_ATTR String CurAlmName = "Alarm";
 
 String Days[]={"Niedziela", "Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piatek", "Sobota"};
 
@@ -19,7 +24,7 @@ String Days[]={"Niedziela", "Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piat
 
 void displayTime() {
   char txt[20];
-  static uint16_t Last_mm, Last_hh;
+  static int Last_mm, Last_hh;
     
   RTC_Date tnow = ttgo->rtc->getDateTime();
   hh = tnow.hour;
@@ -32,7 +37,10 @@ void displayTime() {
 
   // Set text datum to middle centre
   ttgo->tft->setTextDatum(TC_DATUM);  
-  if(mm != Last_mm || hh != Last_hh) ttgo->tft->fillRect(0, TopBarHeight, 240, 240 - TopBarHeight - BottomBarHeight, TFT_BLACK); 
+  if(mm != Last_mm || hh != Last_hh) {
+    ttgo->tft->fillRect(0, TopBarHeight, 240, 240 - TopBarHeight - BottomBarHeight, TFT_BLACK); 
+    //ttgo->tft->pushRect(0, TopBarHeight, 240, 160, desktopBitmap);
+  }
   Last_hh = hh;
   Last_mm = mm;
   

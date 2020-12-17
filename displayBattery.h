@@ -26,7 +26,7 @@ void displayAlarm(){
   AlarmActive = ttgo->rtc->isAlarmEnabled();
 
 
-  ttgo->tft->drawXBitmap(150, 10, alarmIcon, 16, 16, (AlarmActive)? TFT_WHITE : 0x3186, TFT_BLACK);
+  ttgo->tft->drawXBitmap(160, 10, alarmIcon, 16, 16, (AlarmActive)? TFT_WHITE : 0x3186, TFT_BLACK);
    
   /*if(AlarmActive) ttgo->tft->setTextColor(TFT_WHITE);
   else ttgo->tft->setTextColor(0x3186);

@@ -23,7 +23,9 @@ public:
       CatchX = X;
       CatchY = Y;
       Swiping = NewSwiping;
+
       CatchTime = Now;
+      
       if(Catch != nullptr) Catch();
     }else if(!NewSwiping && Swiping){//Koniec Swipingu
       ReleaseX = X;
