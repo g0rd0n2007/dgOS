@@ -1,3 +1,3 @@
 # dgOS
 Lily Go Watch system
-![Desktop](https://drive.google.com/file/d/1S-2DT8-VGJzXh8XLBlCrsBhcr4v4cXLe/view?usp=drivesdk)
+![Desktop](https://drive.google.com/file/d/1S7P7NFWSCUafy0n3RX_JQqKLjDHGg13n/view?usp=sharing)
