@@ -5,12 +5,12 @@
 int hh, mm, ss, mmonth, dday, dayOW; // H, M, S variables
 int yyear; // Year is 16 bit int
 
-RTC_DATA_ATTR int Alarm_hh[NO_OF_ALARMS];
-RTC_DATA_ATTR int Alarm_mm[NO_OF_ALARMS];
-RTC_DATA_ATTR boolean Alarm_Active[NO_OF_ALARMS];
-RTC_DATA_ATTR String Alarm_Names[NO_OF_ALARMS];
+int Alarm_hh[NO_OF_ALARMS] = { 6, 10, 11};
+int Alarm_mm[NO_OF_ALARMS] = { 45, 30, 00};
+boolean Alarm_Active[NO_OF_ALARMS] = { false, false, false };
+String Alarm_Names[NO_OF_ALARMS] = { "Budzik", "Obiad", "Spotkanie" };
 boolean AlarmActive = false;
-RTC_DATA_ATTR String CurAlmName = "Alarm";
+String CurAlmName = "Alarm";
 
 String Days[]={"Niedziela", "Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piatek", "Sobota"};
 
@@ -57,5 +57,9 @@ void displayTime() {
   
   
   ttgo->tft->drawString(Days[dayOW], 120, 160, GFXFF);
+
+  //ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
+  //sprintf(txt, "% 5d", sleepT.TargetTime - millis());
+  //ttgo->tft->drawString(txt, 120, 185, GFXFF);
   
 }

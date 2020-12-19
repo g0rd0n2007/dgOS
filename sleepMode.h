@@ -1,7 +1,6 @@
 #include <dummy.h>
 
 boolean SleepMode = false;
-Timer sleepT;
 
 
 void WakeUp(uint32_t now){
@@ -67,7 +66,7 @@ void ShutDown(){
     esp_sleep_enable_gpio_wakeup();
     esp_light_sleep_start();
 
-
+    //while(1);
     WakeUp(millis());
 }
 

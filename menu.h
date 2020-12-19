@@ -4,15 +4,17 @@ void MenuDraw(TTGOClass *ttgo, cButton b[]){
   ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
   ttgo->tft->setFreeFont(FSS9);
   ttgo->tft->drawString("Menu", 120, 10, GFXFF);
-  for(int i = 0; i < 2; i++) b[i].Draw(ttgo, false);  
+  for(int i = 0; i < 4; i++) b[i].Draw(ttgo, false);  
 }
 
 void Menu(TTGOClass *ttgo){
   Swipe s;
   uint32_t now;
-  cButton _b[2] = {
+  cButton _b[4] = {
     cButton(85, 205, 70, ButtonHeight, "Wstecz", ButtonOK_FG, ButtonOK_BG),
-    cButton(0, 50, ButtonWidth, ButtonHeight, "Alarm")
+    cButton(0, 50, ButtonWidth, ButtonHeight, "Alarm"),
+    cButton(60, 50, ButtonWidth, ButtonHeight, "Ekran"),
+    cButton(120, 50, ButtonWidth, ButtonHeight, "Stoper"),
   };
   
   MenuDraw(ttgo, _b);
@@ -23,10 +25,18 @@ void Menu(TTGOClass *ttgo){
   do{
     now = millis();
     s.Run(ttgo, now);
-    for(int i = 0; i < 2; i++) _b[i].Run(ttgo, s, now);
+    for(int i = 0; i < 4; i++) _b[i].Run(ttgo, s, now);
 
     if(_b[1].IsReleased()){
       AlarmPage(ttgo);
+      MenuDraw(ttgo, _b);
+    }
+    if(_b[2].IsReleased()){
+      ScreenPage(ttgo);
+      MenuDraw(ttgo, _b);
+    }
+    if(_b[3].IsReleased()){
+      StoperPage(ttgo);
       MenuDraw(ttgo, _b);
     }
   } while(!_b[0].IsReleased());

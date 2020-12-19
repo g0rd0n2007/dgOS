@@ -5,9 +5,10 @@
 
 #include "timer.h"
 #include "Free_Fonts.h"
+//#include "SPIFFS.h"
 TTGOClass *ttgo;
 
-Timer drawT;
+Timer drawT, sleepT;
 uint32_t Now;
 boolean irqAPX202 = false, irqRTC = false;
 
@@ -20,10 +21,12 @@ boolean irqAPX202 = false, irqRTC = false;
 #include "getInput.h"
 
 #include "alarm_page.h"
+#include "screen_page.h" 
+#include "stoper_page.h"
 #include "menu.h"
 
 
-cButton cMenu = cButton(85, 205, 70, ButtonHeight, "Menu");
+cButton cMenu = cButton(85, 205, 70, ButtonHeight, "...");
 Swipe S;
 
 void S_Release(){
@@ -53,7 +56,7 @@ boolean S_Timeout(Swipe *s, uint32_t t){
       sprintf(buf, "%d/%d/%04d", dday, mmonth, yyear);
       a = String(buf);
 
-      if(getInput(ttgo, "Ustawianie dnia:", &a, 10, BPLUS_DATE)){
+      if(getInput(ttgo, "Ustawianie daty:", &a, 10, BPLUS_DATE)){
         sscanf(a.c_str(), "%d/%d/%d", &dday, &mmonth, &yyear);
         ttgo->rtc->setDateTime(yyear, mmonth, dday, hh, mm, ss);
       }
@@ -77,20 +80,8 @@ void setup()
     ttgo = TTGOClass::getWatch();
     ttgo->begin();
 
-
-    /*esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
-    switch(wakeup_reason)
-    {
-      case 4:
-        if(ttgo->rtc->alarmActive()) break;
-        else StartLowPowerMode();
-        
-        break;
-      default: break;
-    }*/
-
-    
     ttgo->openBL(); // Turn on the backlight
+    ttgo->bl->adjust(BacklightLevel);
     
     // ADC monitoring must be enabled to use the AXP202 monitoring function
     ttgo->power->adc1Enable(AXP202_VBUS_VOL_ADC1 | AXP202_VBUS_CUR_ADC1 | AXP202_BATT_CUR_ADC1 | AXP202_BATT_VOL_ADC1, true);
@@ -110,19 +101,20 @@ void setup()
     ttgo->power->clearIRQ();
 
     ttgo->motor_begin();
-
     
     ttgo->rtc->check();
     ttgo->rtc->syncToSystem();
+    ttgo->rtc->disableTimer();
     //RTC_Alarm alm = ttgo->rtc->getAlarm();
     //alarm_hh = alm.hour;
     //alarm_mm = alm.minute;
     ttgo->rtc->setAlarm(Alarm_hh[0], Alarm_mm[0], PCF8563_NO_ALARM, PCF8563_NO_ALARM, Alarm_Active[0]);
     AlarmActive = ttgo->rtc->isAlarmEnabled();
     
+    
     Now = millis();
     drawT.Set(Now, 1000);
-    sleepT.Set(Now, 10000);
+    sleepT.Set(Now, 5000);
     S.Release = S_Release;
     S.TimeOut = S_Timeout;
     

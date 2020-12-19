@@ -82,18 +82,18 @@ void AlarmPage(TTGOClass *ttgo){
     //cButton(0, 30, ButtonWidth, ButtonHeight, "Alarm")
   };
   cEdit _e[2 * NO_OF_ALARMS] = {
-    cEdit(5,   5, 230, ButtonHeight, &Alarm_Names[0], false),
-    cEdit(5,  75, 230, ButtonHeight, &Alarm_Names[1], false),
-    cEdit(5, 145, 230, ButtonHeight, &Alarm_Names[2], false),
+    cEdit(5,   5, 100, ButtonHeight, &Alarm_Names[0], false),
+    cEdit(5,  75, 100, ButtonHeight, &Alarm_Names[1], false),
+    cEdit(5, 145, 100, ButtonHeight, &Alarm_Names[2], false),
     
-    cEdit(5,  40, 70, ButtonHeight, &Sgodzina0, false),
-    cEdit(5, 110, 70, ButtonHeight, &Sgodzina1, false),
-    cEdit(5, 180, 70, ButtonHeight, &Sgodzina2, false)
+    cEdit(110,   5, 65, ButtonHeight, &Sgodzina0, false),
+    cEdit(110,  75, 65, ButtonHeight, &Sgodzina1, false),
+    cEdit(110, 145, 65, ButtonHeight, &Sgodzina2, false)
   };
   cCheckbox _c[NO_OF_ALARMS] ={
-    cCheckbox(180,  40, ButtonWidth, ButtonHeight, Alarm_Active[0]),
-    cCheckbox(180, 110, ButtonWidth, ButtonHeight, Alarm_Active[1]),
-    cCheckbox(180, 180, ButtonWidth, ButtonHeight, Alarm_Active[2])
+    cCheckbox(180,   5, ButtonWidth, ButtonHeight, Alarm_Active[0]),
+    cCheckbox(180,  75, ButtonWidth, ButtonHeight, Alarm_Active[1]),
+    cCheckbox(180, 145, ButtonWidth, ButtonHeight, Alarm_Active[2])
   };
   
   AlarmPageDraw(ttgo, _b, _e, _c);
@@ -109,15 +109,15 @@ void AlarmPage(TTGOClass *ttgo){
     for(int i = 0; i < NO_OF_ALARMS; i++) _c[i].Run(ttgo, s);
 
     if(_e[0].IsReleased()){
-      getInput(ttgo, "Nazwa dla " + Alarm_Names[0], &Alarm_Names[0], 16, BPLUS_ALFA);
+      getInput(ttgo, "Nazwa dla " + Alarm_Names[0], &Alarm_Names[0], 9, BPLUS_ALFA);
       AlarmPageDraw(ttgo, _b, _e, _c);
     }
     if(_e[1].IsReleased()){
-      getInput(ttgo, "Nazwa dla " + Alarm_Names[1], &Alarm_Names[1], 16, BPLUS_ALFA);
+      getInput(ttgo, "Nazwa dla " + Alarm_Names[1], &Alarm_Names[1], 9, BPLUS_ALFA);
       AlarmPageDraw(ttgo, _b, _e, _c);
     }
     if(_e[2].IsReleased()){
-      getInput(ttgo, "Nazwa dla " + Alarm_Names[2], &Alarm_Names[2], 16, BPLUS_ALFA);
+      getInput(ttgo, "Nazwa dla " + Alarm_Names[2], &Alarm_Names[2], 9, BPLUS_ALFA);
       AlarmPageDraw(ttgo, _b, _e, _c);
     }
     
