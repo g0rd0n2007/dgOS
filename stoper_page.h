@@ -12,14 +12,14 @@ void StoperPageDraw(TTGOClass *ttgo, cButton b[], long int ttime, int p, long in
   
   //ttgo->tft->setTextDatum(TC_DATUM);   
   ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-  ttgo->tft->setFreeFont(FMB18);
+  ttgo->tft->setFreeFont(FSS18);
   //ttgo->tft->drawString("Alarm", 120, 10, GFXFF);*/
 
   ttgo->tft->setTextDatum(TC_DATUM);
 
   if(p>=0){ 
-    ttgo->tft->drawString(SecToTime(ttime), 120, 10, GFXFF);
-    ttgo->tft->setFreeFont(FM9);
+    ttgo->tft->drawString(" " + SecToTime(ttime) + " ", 120, 10, GFXFF);
+    ttgo->tft->setFreeFont(FSS9);
     if(his[0] >= 0) {
       ttgo->tft->drawString(SecToTime(his[0]), 60, 90, GFXFF);
     }
@@ -61,8 +61,8 @@ void StoperPage(TTGOClass *ttgo){
   
   cButton _b[3] = {
     cButton(85, 205, 70, ButtonHeight, "Wstecz", ButtonOK_FG, ButtonOK_BG),
-    cButton(40, 50, 70, ButtonHeight, "Start", ButtonOK_FG, ButtonOK_BG),
-    cButton(130, 50, 70, ButtonHeight, "Pomiar")
+    cButton(30, 50, 70, ButtonHeight, "Start", ButtonOK_FG, ButtonOK_BG),
+    cButton(140, 50, 70, ButtonHeight, "Pomiar", TFT_WHITE, 0x3016)
   };
       
   StoperPageDraw(ttgo, _b, ttime, 2, his);
@@ -98,13 +98,16 @@ void StoperPage(TTGOClass *ttgo){
         last_s = _t.second;
         _b[1].Text = "Stop";
         _b[2].Text = "Pomiar";
+        _b[2].BG = 0x3016;
       }else{
         //ttgo->rtc->disableCLK();
         //ttgo->rtc->disableTimer();
         _b[1].Text = "Start";
         _b[2].Text = "Reset";
+        _b[2].BG = ButtonNo_BG;
       }
       StoperPageDraw(ttgo, _b, ttime, 1, his);
+      ttgo->motor->onec();
     }
     if(_b[2].IsPressed()){
       if(Running){

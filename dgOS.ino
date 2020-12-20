@@ -11,6 +11,7 @@ TTGOClass *ttgo;
 Timer drawT, sleepT;
 uint32_t Now;
 boolean irqAPX202 = false, irqRTC = false;
+String SecToTime(long int t);
 
 #include "icons.h"
 #include "displayTime.h"
@@ -23,10 +24,11 @@ boolean irqAPX202 = false, irqRTC = false;
 #include "alarm_page.h"
 #include "screen_page.h" 
 #include "stoper_page.h"
+#include "timer_page.h"
 #include "menu.h"
 
 
-cButton cMenu = cButton(85, 205, 70, ButtonHeight, "...");
+cButton cMenu = cButton(85, 205, 70, ButtonHeight, "...", TFT_WHITE, TFT_BLACK);
 Swipe S;
 
 void S_Release(){
@@ -105,10 +107,13 @@ void setup()
     ttgo->rtc->check();
     ttgo->rtc->syncToSystem();
     ttgo->rtc->disableTimer();
+    ttgo->rtc->disableCLK();
+    ttgo->rtc->clearTimer();
     //RTC_Alarm alm = ttgo->rtc->getAlarm();
     //alarm_hh = alm.hour;
     //alarm_mm = alm.minute;
     ttgo->rtc->setAlarm(Alarm_hh[0], Alarm_mm[0], PCF8563_NO_ALARM, PCF8563_NO_ALARM, Alarm_Active[0]);
+    ttgo->rtc->disableAlarm();
     AlarmActive = ttgo->rtc->isAlarmEnabled();
     
     
