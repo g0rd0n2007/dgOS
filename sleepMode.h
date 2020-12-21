@@ -63,10 +63,23 @@ void ShutDown(){
 
     gpio_wakeup_enable((gpio_num_t)AXP202_INT , GPIO_INTR_LOW_LEVEL);
     gpio_wakeup_enable((gpio_num_t)RTC_INT_PIN , GPIO_INTR_LOW_LEVEL);
+    gpio_wakeup_enable((gpio_num_t)BMA423_INT1 , GPIO_INTR_HIGH_LEVEL);
     esp_sleep_enable_gpio_wakeup();
-    esp_light_sleep_start();
 
-    //while(1);
+    while(!irqAPX202 && !irqRTC){
+      esp_light_sleep_start();
+
+      RTC_Date tnow = ttgo->rtc->getDateTime();
+      if(tnow.day != dday){
+        ttgo->bma->resetStepCounter();
+        dday = tnow.day;
+      }
+
+      if(irqBMA){
+        ReadBMA_IRQ();
+      }
+    }
+    
     WakeUp(millis());
 }
 

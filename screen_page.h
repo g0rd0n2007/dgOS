@@ -20,7 +20,7 @@ void ScreenPageDraw(TTGOClass *ttgo, cButton b[], cEdit e[]){
 void ScreenPage(TTGOClass *ttgo){
   Swipe s;
   uint32_t now; 
-  String Stimeout = String(5);
+  String Stimeout = String(sleepT.Duration / 1000);
   String Sbacklight = String(BacklightLevel);
   
   cButton _b[1] = {
@@ -46,7 +46,8 @@ void ScreenPage(TTGOClass *ttgo){
 
     if(_e[0].IsReleased()){
       getInput(ttgo, "Timeout", &Stimeout, 2, BPLUS_NONE);
-      //sleepT.Duration = 1000 * constrain(Stimeout.toInt(), 2, 15);
+      sleepT.Duration = 1000 * constrain(Stimeout.toInt(), 2, 15);
+      Stimeout = String(sleepT.Duration / 1000);
       ScreenPageDraw(ttgo, _b, _e);
     }
     if(_e[1].IsReleased()){

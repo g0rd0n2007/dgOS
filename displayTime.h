@@ -13,6 +13,7 @@ boolean AlarmActive = false;
 String CurAlmName = "Alarm";
 
 String Days[]={"Niedziela", "Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piatek", "Sobota"};
+String Months[]={"Styczen", "Luty", "Marzec", "Kwiecien", "Maj", "Czerwiec", "Lipiec", "Sierpien", "Wrzesien", "Pazdziernik", "Listopad", "Grudzien"};
 
 /*uint8_t dayOfWeek(int d, int m, int y){
   m = (m + 9) % 12;
@@ -23,7 +24,7 @@ String Days[]={"Niedziela", "Poniedzialek", "Wtorek", "Sroda", "Czwartek", "Piat
 }*/
 
 void displayTime() {
-  char txt[20];
+  char txt[30];
   static int Last_mm, Last_hh;
     
   RTC_Date tnow = ttgo->rtc->getDateTime();
@@ -40,6 +41,7 @@ void displayTime() {
   if(mm != Last_mm || hh != Last_hh) {
     ttgo->tft->fillRect(0, TopBarHeight, 240, 240 - TopBarHeight - BottomBarHeight, TFT_BLACK); 
     //ttgo->tft->pushRect(0, TopBarHeight, 240, 160, desktopBitmap);
+    
   }
   Last_hh = hh;
   Last_mm = mm;
@@ -49,7 +51,7 @@ void displayTime() {
   ttgo->tft->setFreeFont(FSSB24);
   ttgo->tft->drawString(txt, 120, 60, GFXFF);
   
-  sprintf(txt, "%02d/%02d/%04d", dday, mmonth, yyear);
+  sprintf(txt, "%d %s %04d", dday, Months[mmonth - 1], yyear);
   //ttgo->tft->setTextColor(0x94B2);
   ttgo->tft->setFreeFont(FSS12);
   ttgo->tft->drawString(txt, 120, 130, GFXFF);
@@ -58,8 +60,6 @@ void displayTime() {
   
   ttgo->tft->drawString(Days[dayOW], 120, 160, GFXFF);
 
-  //ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-  //sprintf(txt, "% 5d", sleepT.TargetTime - millis());
-  //ttgo->tft->drawString(txt, 120, 185, GFXFF);
+  
   
 }
