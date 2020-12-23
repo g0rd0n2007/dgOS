@@ -7,7 +7,7 @@
 #include "Free_Fonts.h"
 //#include "SPIFFS.h"
 TTGOClass *ttgo;
-//TFT_eSprite SP(ttgo.tft);
+TFT_eSprite *g;
 
 Timer drawT, sleepT;
 uint32_t Now;
@@ -17,7 +17,8 @@ long int StepCount = 0;
 void ReadBMA_IRQ();
 
 #include "icons.h"
-#include "desktop.h"
+#include "wallpapers/liscie.h"
+#define Wallpaper liscie
 #include "displayTime.h"
 #include "displayBattery.h"
 #include "sleepMode.h"
@@ -32,7 +33,7 @@ void ReadBMA_IRQ();
 #include "menu.h"
 
 
-cButton cMenu = cButton(85, 205, 70, ButtonHeight, "...", TFT_WHITE, TFT_BLACK);
+cButton cMenu = cButton(85, 205, 70, ButtonHeight, "...", TFT_WHITE, TFT_WHITE);
 Swipe S;
 
 void S_Release(){
@@ -77,16 +78,28 @@ boolean S_Timeout(Swipe *s, uint32_t t){
 }
 
 void DrawDesktop(){
-  //ttgo->tft->setSwapBytes(true);
-  //SP.pushImage(0, 0, 240, 240, desktop_image);
   
-  displayTime(); 
-  DisplaySteps();
-  displayBattery(); 
-  displayAlarm();
-  cMenu.Draw(ttgo);
+  
+  //TFT_eSprite G(ttgo->tft);
+  //G.setColorDepth(16);
+  //G.createSprite(240, 240);
+  //SP.createSprite(240, 240);
+  //G.setSwapBytes(true);
+  //ttgo->tft->setSwapBytes(true);
+  g->pushImage(0, 0, 240, 240, Wallpaper);
+  
+  displayTime(g); 
+  DisplaySteps(g);
+  displayBattery(g); 
+  displayAlarm(g);
+  cMenu.Draw(g);
 
   //SP.pushSprite(0, 0);
+
+  
+  //G.fillSprite(TFT_GREEN);
+  g->pushSprite(0, 0);
+  //G.deleteSprite();  
 }
 
 void setup()
@@ -94,8 +107,23 @@ void setup()
     ttgo = TTGOClass::getWatch();
     ttgo->begin();
 
+    g = new TFT_eSprite(ttgo->tft);
+    g->setColorDepth(16);
+    g->createSprite(240, 240);
+    g->setSwapBytes(true);
+
     ttgo->openBL(); // Turn on the backlight
     ttgo->bl->adjust(BacklightLevel);
+
+
+    //test
+    /*for(int i=0;i<60;i++){
+      g->fillSprite(TFT_YELLOW);
+      g->pushSprite(0, 0);
+      g->fillSprite(TFT_BLUE);
+      g->pushSprite(0, 0);
+    }*/
+
 
     //Stepcount
     // Accel parameter structure
@@ -202,10 +230,7 @@ void setup()
     sleepT.Set(Now, 5000);
     S.Release = S_Release;
     S.TimeOut = S_Timeout;
-
-    //SP = TFT_eSprite(ttgo->tft);
-    //SP.createSprite(240, 240);
-    //SP.setSwapBytes(true);
+        
     DrawDesktop();
     //ttgo->motor->onec();
     setCpuFrequencyMhz(40);
@@ -217,7 +242,7 @@ void loop()
 
     if(!SleepMode){
       S.Run(ttgo, Now);
-      cMenu.Run(ttgo, S, Now);
+      cMenu.Run(g, S, Now);
 
       if(cMenu.IsReleased()){
         Menu(ttgo);
@@ -243,17 +268,17 @@ void loop()
       ttgo->power->readIRQ();
       if (ttgo->power->isVbusPlugInIRQ()) {
         if(SleepMode) WakeUp(Now);
-        displayBattery();
+        DrawDesktop();
         sleepT.SetNext(Now);
       }
       if (ttgo->power->isVbusRemoveIRQ()) {
         if(SleepMode) WakeUp(Now);
-        displayBattery();
+        DrawDesktop();
         sleepT.SetNext(Now);
       }
       if(ttgo->power->isChargingDoneIRQ()){
         if(SleepMode) WakeUp(Now);
-        displayBattery();
+        DrawDesktop();
         sleepT.SetNext(Now);
         ttgo->motor->onec();
       }

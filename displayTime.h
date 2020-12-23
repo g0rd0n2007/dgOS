@@ -23,9 +23,9 @@ String Months[]={"Styczen", "Luty", "Marzec", "Kwiecien", "Maj", "Czerwiec", "Li
   return dn % 7;  
 }*/
 
-void displayTime() {
+void displayTime(TFT_eSprite *g) {
   char txt[30];
-  static int Last_mm, Last_hh;
+  //static int Last_mm, Last_hh;
     
   RTC_Date tnow = ttgo->rtc->getDateTime();
   hh = tnow.hour;
@@ -37,28 +37,28 @@ void displayTime() {
   dayOW = ttgo->rtc->getDayOfWeek(dday, mmonth, yyear);
 
   // Set text datum to middle centre
-  ttgo->tft->setTextDatum(TC_DATUM);  
-  if(mm != Last_mm || hh != Last_hh) {
-    ttgo->tft->fillRect(0, TopBarHeight, 240, 240 - TopBarHeight - BottomBarHeight, TFT_BLACK); 
+  g->setTextDatum(TC_DATUM);  
+  //if(mm != Last_mm || hh != Last_hh) {
+    //ttgo->tft->fillRect(0, TopBarHeight, 240, 240 - TopBarHeight - BottomBarHeight, TFT_BLACK); 
     //ttgo->tft->pushRect(0, TopBarHeight, 240, 160, desktopBitmap);
     
-  }
-  Last_hh = hh;
-  Last_mm = mm;
+  //}
+  //Last_hh = hh;
+  //Last_mm = mm;
   
   sprintf(txt, "%d:%02d", hh, mm);
-  ttgo->tft->setTextColor(TFT_WHITE);
-  ttgo->tft->setFreeFont(FSSB24);
-  ttgo->tft->drawString(txt, 120, 60, GFXFF);
+  g->setTextColor(TFT_WHITE);
+  g->setFreeFont(FSSB24);
+  g->drawString(txt, 120, 60, GFXFF);
   
   sprintf(txt, "%d %s %04d", dday, Months[mmonth - 1], yyear);
   //ttgo->tft->setTextColor(0x94B2);
-  ttgo->tft->setFreeFont(FSS12);
-  ttgo->tft->drawString(txt, 120, 130, GFXFF);
+  g->setFreeFont(FSS12);
+  g->drawString(txt, 120, 130, GFXFF);
 
   
   
-  ttgo->tft->drawString(Days[dayOW], 120, 160, GFXFF);
+  g->drawString(Days[dayOW], 120, 160, GFXFF);
 
   
   

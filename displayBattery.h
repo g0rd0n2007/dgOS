@@ -1,32 +1,32 @@
-void displayBattery(){
+void displayBattery(TFT_eSprite *g){
   char txt[20];
   static uint16_t LastPercentage;
   uint16_t Percentage;
 
   LastPercentage = Percentage;
   Percentage = ttgo->power->getBattPercentage();
-  if(Percentage != LastPercentage) ttgo->tft->fillRect(180, 0, 60, TopBarHeight, TFT_BLACK);
+  //if(Percentage != LastPercentage) ttgo->tft->fillRect(180, 0, 60, TopBarHeight, TFT_BLACK);
 
   
-  if (ttgo->power->isVBUSPlug()) ttgo->tft->setTextColor(TFT_GREEN, TFT_GREEN);
-  else if (Percentage >= 20) ttgo->tft->setTextColor(TFT_WHITE, TFT_WHITE);
-  else if (Percentage >= 10) ttgo->tft->setTextColor(TFT_YELLOW, TFT_YELLOW);
-  else ttgo->tft->setTextColor(TFT_RED, TFT_RED);
+  if (ttgo->power->isVBUSPlug()) g->setTextColor(TFT_GREEN, TFT_GREEN);
+  else if (Percentage >= 20) g->setTextColor(TFT_WHITE, TFT_WHITE);
+  else if (Percentage >= 10) g->setTextColor(TFT_YELLOW, TFT_YELLOW);
+  else g->setTextColor(TFT_RED, TFT_RED);
 
   
   sprintf(txt, "%d%%", Percentage);
-  ttgo->tft->setTextDatum(TR_DATUM);
-  ttgo->tft->setFreeFont(FSS9);
-  ttgo->tft->drawString(txt, 230, 10, GFXFF);  
+  g->setTextDatum(TR_DATUM);
+  g->setFreeFont(FSS9);
+  g->drawString(txt, 230, 10, GFXFF);  
 }
 
 
 
-void displayAlarm(){
+void displayAlarm(TFT_eSprite *g){
   AlarmActive = ttgo->rtc->isAlarmEnabled();
 
 
-  ttgo->tft->drawXBitmap(160, 10, alarmIcon, 16, 16, (AlarmActive)? TFT_WHITE : 0x3186, TFT_BLACK);
+  if(AlarmActive) g->drawXBitmap(160, 10, alarmIcon, 16, 16, TFT_WHITE);
    
   /*if(AlarmActive) ttgo->tft->setTextColor(TFT_WHITE);
   else ttgo->tft->setTextColor(0x3186);
@@ -36,11 +36,11 @@ void displayAlarm(){
   ttgo->tft->drawString("Alm", 150, 10, GFXFF); */ 
 }
 
-void DisplaySteps(){
-  ttgo->tft->drawXBitmap(10, 10, stepIcon, 16, 16, TFT_WHITE);
+void DisplaySteps(TFT_eSprite *g){
+  g->drawXBitmap(10, 10, stepIcon, 16, 16, TFT_WHITE);
 
-  ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-  ttgo->tft->setFreeFont(FSS9);
-  ttgo->tft->setTextDatum(TL_DATUM); 
-  ttgo->tft->drawString(String(StepCount) + " ", 30, 10, GFXFF);  
+  g->setTextColor(TFT_WHITE);
+  g->setFreeFont(FSS9);
+  g->setTextDatum(TL_DATUM); 
+  g->drawString(String(StepCount) + " ", 30, 10, GFXFF);  
 }

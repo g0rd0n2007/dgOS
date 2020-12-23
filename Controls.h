@@ -14,6 +14,8 @@ public:
   int16_t X, Y, Width, Height;
 
   void Draw(TTGOClass *ttgo);
+  //TFT_eSprite *g;
+  void Draw(TFT_eSprite *g);
 };
 
 enum ButtonState{
@@ -61,6 +63,24 @@ public:
     ttgo->tft->drawString(Text, X + Width / 2, Y + Height / 2, GFXFF);
   }
 
+  void Draw(TFT_eSprite *g){
+    g->setTextDatum(MC_DATUM);  
+
+    if(Pressed == BS_Pressed || Pressed == BS_Holded)  {
+      g->setTextColor(TFT_BLACK, TFT_WHITE);
+      g->fillRoundRect(X, Y, Width, Height, 15, TFT_WHITE);      
+    }else {
+      g->setTextColor(FG, BG);
+      if(FG != BG) g->fillRoundRect(X, Y, Width, Height, 15, BG);
+      else g->drawRoundRect(X, Y, Width, Height, 15, FG);
+    }
+        
+    g->setFreeFont(FSS9);
+    
+    
+    g->drawString(Text, X + Width / 2, Y + Height / 2, GFXFF);
+  }
+
   void Run(TTGOClass *ttgo, Swipe s, uint32_t now){
     switch(Pressed){
       case BS_Idle:
@@ -88,6 +108,43 @@ public:
         if(!s.Swiping) {
           Pressed = BS_Released;
           Draw(ttgo, false);
+        }
+        break;
+      case BS_Released:
+        Pressed = BS_Idle;
+        break;
+    }    
+  }
+
+  void Run(TFT_eSprite *g, Swipe s, uint32_t now){
+    switch(Pressed){
+      case BS_Idle:
+        if(s.Swiping && s.CatchInRect(X, Y, Width, Height)) { 
+          Pressed = BS_Pressed;  
+
+          CatchTime[9] = CatchTime[8];
+          CatchTime[8] = CatchTime[7];
+          CatchTime[7] = CatchTime[6];
+          CatchTime[6] = CatchTime[5];
+          CatchTime[5] = CatchTime[4];
+          CatchTime[4] = CatchTime[3];
+          CatchTime[3] = CatchTime[2];
+          CatchTime[2] = CatchTime[1];
+          CatchTime[1] = CatchTime[0];
+          CatchTime[0] = now;
+          
+          Draw(g); 
+          g->pushSprite(0, 0);
+        }
+        break;
+      case BS_Pressed:
+        Pressed = BS_Holded;
+        break;
+      case BS_Holded:
+        if(!s.Swiping) {
+          Pressed = BS_Released;
+          Draw(g);
+          g->pushSprite(0, 0);
         }
         break;
       case BS_Released:
