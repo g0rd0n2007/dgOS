@@ -17,7 +17,7 @@ long int StepCount = 0;
 void ReadBMA_IRQ();
 
 #include "icons.h"
-#include "wallpapers/liscie.h"
+#include "liscie.h"
 #define Wallpaper liscie
 #include "displayTime.h"
 #include "displayBattery.h"

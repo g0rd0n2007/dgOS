@@ -50,10 +50,10 @@ public:
     
     if(Pushed)  {
       ttgo->tft->setTextColor(TFT_BLACK, TFT_WHITE);
-      ttgo->tft->fillRoundRect(X, Y, Width, Height, 5, TFT_WHITE);      
+      ttgo->tft->fillRoundRect(X, Y, Width, Height, Height / 2, TFT_WHITE);      
     }else {
       ttgo->tft->setTextColor(FG, BG);
-      ttgo->tft->fillRoundRect(X, Y, Width, Height, 5, BG);
+      ttgo->tft->fillRoundRect(X, Y, Width, Height, Height / 2, BG);
       //ttgo->tft->drawRoundRect(X, Y, Width, Height, 5, FG);
     }
         
@@ -68,11 +68,11 @@ public:
 
     if(Pressed == BS_Pressed || Pressed == BS_Holded)  {
       g->setTextColor(TFT_BLACK, TFT_WHITE);
-      g->fillRoundRect(X, Y, Width, Height, 15, TFT_WHITE);      
+      g->fillRoundRect(X, Y, Width, Height, Height / 2, TFT_WHITE);      
     }else {
       g->setTextColor(FG, BG);
       if(FG != BG) g->fillRoundRect(X, Y, Width, Height, 15, BG);
-      else g->drawRoundRect(X, Y, Width, Height, 15, FG);
+      else g->drawRoundRect(X, Y, Width, Height, Height / 2, FG);
     }
         
     g->setFreeFont(FSS9);
@@ -314,20 +314,20 @@ public:
       
     if(importance > 1) {
       ttgo->tft->setTextColor(FG, BG);      
-      ttgo->tft->fillRoundRect(X, Y, Width, Height, 5, BG);
-      ttgo->tft->drawRoundRect(X, Y, Width, Height, 5, FG);
+      ttgo->tft->fillRoundRect(X, Y, Width, Height, Height / 2, BG);
+      ttgo->tft->drawRoundRect(X, Y, Width, Height, Height / 2, FG);
       ttgo->tft->drawString(*Text, X + 7, Y + Height / 2, GFXFF);
     }
 
     int w = ttgo->tft->textWidth(*Text);
     if(Blinks && Cursor) {
-      ttgo->tft->drawFastHLine(X + 7 + w, Y + 4, 3, FG);
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + 4, 3, FG);
       ttgo->tft->drawFastVLine(X + 8 + w, Y + 5, Height - 10, FG);
-      ttgo->tft->drawFastHLine(X + 7 + w, Y + Height - 5, 3, FG);
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + Height - 5, 3, FG);
     }else if(Blinks && !Cursor) {
-      ttgo->tft->drawFastHLine(X + 7 + w, Y + 4, 3, BG);
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + 4, 3, BG);
       ttgo->tft->drawFastVLine(X + 8 + w, Y + 5, Height - 10, BG);
-      ttgo->tft->drawFastHLine(X + 7 + w, Y + Height - 5, 3, BG);
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + Height - 5, 3, BG);
     }
   }
 
