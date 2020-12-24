@@ -102,8 +102,24 @@ void getInput_T2M(int Mode, cButton _b[]){
               break;
           }
 }
+
+void getInputDraw(TFT_eSprite *g, String info, cButton _b[], cEdit *_e){
   
-boolean getInput(TTGOClass *ttgo, String info, String *TXT, int max_length, String bplus[4]){
+  g->fillSprite(TFT_BLACK);
+
+  g->setTextDatum(TL_DATUM);   
+  g->setTextColor(TFT_WHITE, TFT_BLACK);
+  g->setFreeFont(FSS9);
+  g->drawString(info, 10, 10, GFXFF);
+
+  for(int i = 0; i < 17; i++) _b[i].Draw(g);  
+  _e->Draw(g);  
+
+  g->pushSprite(0, 0);
+  
+}
+  
+boolean getInput(TFT_eSprite *g, String info, String *TXT, int max_length, String bplus[4]){
     Swipe s;
     uint32_t now;
     cButton _b[17] = {
@@ -135,22 +151,13 @@ boolean getInput(TTGOClass *ttgo, String info, String *TXT, int max_length, Stri
     };
     cEdit Edit = cEdit(0, 45, 176, ButtonHeight, TXT, true);
     //boolean ShowCursor = true;
-  
     
-    ttgo->tft->fillScreen(TFT_BLACK); 
-    ttgo->tft->setTextDatum(TL_DATUM);   
-  
-    ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-    ttgo->tft->setFreeFont(FSS9);
-    ttgo->tft->drawString(info, 10, 10, GFXFF);
 
     int Mode = 0;
     if(bplus[3] == "1aA") Mode = 1;
     getInput_T2M(Mode, _b);
   
-    for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false);  
-    Edit.Draw(ttgo, 2);  
-    
+    getInputDraw(g, info, _b, &Edit);    
   
     do{s.Run(ttgo, millis()); } while(s.Swiping);
     
@@ -165,64 +172,66 @@ boolean getInput(TTGOClass *ttgo, String info, String *TXT, int max_length, Stri
           String buf = _b[0].Text;
           buf.replace("_", " ");
           StrQuickAdd(TXT, buf, _b[0].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[1].IsPressed()) { 
           StrQuickAdd(TXT, _b[1].Text, _b[1].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[2].IsPressed()) { 
           StrQuickAdd(TXT, _b[2].Text, _b[2].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[3].IsPressed()) { 
           StrQuickAdd(TXT, _b[3].Text, _b[3].GetQuickPressIdx(), max_length); 
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[4].IsPressed()) { 
           StrQuickAdd(TXT, _b[4].Text, _b[4].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[5].IsPressed()) { 
           StrQuickAdd(TXT, _b[5].Text, _b[5].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[6].IsPressed()) { 
           StrQuickAdd(TXT, _b[6].Text, _b[6].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[7].IsPressed()) { 
           StrQuickAdd(TXT, _b[7].Text, _b[7].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[8].IsPressed()) { 
           StrQuickAdd(TXT, _b[8].Text, _b[8].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[9].IsPressed()) { 
           StrQuickAdd(TXT, _b[9].Text, _b[9].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[13].IsPressed()) { 
           StrQuickAdd(TXT, _b[13].Text, _b[13].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[14].IsPressed()) { 
           StrQuickAdd(TXT, _b[14].Text, _b[14].GetQuickPressIdx(), max_length);
-          Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);
       }
       else if(_b[15].IsPressed() && _b[15].Text == "Caps") {
           if(Mode == 1) Mode = 2;
           else if(Mode == 2) Mode = 1;
 
           getInput_T2M(Mode, _b);
-          for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false); 
+          //for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false); 
+          getInputDraw(g, info, _b, &Edit);
       }        
             
       if(TXT->length() > 0) {
         if(_b[12].IsPressed()){//backspace
           TXT->remove(TXT->length() - 1, 1); 
-          Edit.Draw(ttgo, 2);        
+          //Edit.Draw(ttgo, 2); 
+          getInputDraw(g, info, _b, &Edit);       
         }
       }
       if(_b[16].IsPressed() && _b[16].Text == "1aA") { 
@@ -231,12 +240,13 @@ boolean getInput(TTGOClass *ttgo, String info, String *TXT, int max_length, Stri
           else if(Mode == 3) Mode = 0;
 
           getInput_T2M(Mode, _b);
-          for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false);
+          //for(int i = 0; i < 17; i++) _b[i].Draw(ttgo, false);
+          getInputDraw(g, info, _b, &Edit);
       }
     }while(!_b[10].IsReleased() && !_b[11].IsReleased());
 
     do{s.Run(ttgo, millis()); } while(s.Swiping);
-    ttgo->tft->fillScreen(TFT_BLACK); 
+    //ttgo->tft->fillScreen(TFT_BLACK); 
 
     if(_b[11].IsReleased()) return true;
     else return false;

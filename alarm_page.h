@@ -1,8 +1,8 @@
 
 
       
-void AlarmPageDraw(TTGOClass *ttgo, cButton b[], cEdit e[], cCheckbox c[]){
-  ttgo->tft->fillScreen(TFT_BLACK); 
+void AlarmPageDraw(TFT_eSprite *g, cButton b[], cEdit e[], cCheckbox c[]){
+  g->fillSprite(TFT_BLACK); 
   /*ttgo->tft->setTextDatum(TC_DATUM);   
   ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
   ttgo->tft->setFreeFont(FSS9);
@@ -11,12 +11,12 @@ void AlarmPageDraw(TTGOClass *ttgo, cButton b[], cEdit e[], cCheckbox c[]){
   //ttgo->tft->setTextDatum(TL_DATUM);
   //ttgo->tft->drawString("Godzina:", 10, 55, GFXFF);
   
-  for(int i = 0; i < 1; i++) b[i].Draw(ttgo, false);  
-  for(int i = 0; i < (2 * NO_OF_ALARMS); i++) e[i].Draw(ttgo, 2);
-  for(int i = 0; i < NO_OF_ALARMS; i++) c[i].Draw(ttgo); 
+  for(int i = 0; i < 1; i++) b[i].Draw(g);  
+  for(int i = 0; i < (2 * NO_OF_ALARMS); i++) e[i].Draw(g);
+  for(int i = 0; i < NO_OF_ALARMS; i++) c[i].Draw(g); 
  
   
-  
+  g->pushSprite(0, 0);
 }
 
 int HourToMin(int h, int m){
@@ -78,7 +78,7 @@ void AlarmPage(TTGOClass *ttgo){
   String Sgodzina2 = String(godzina2);
   
   cButton _b[1] = {
-    cButton(85, 205, 70, ButtonHeight, "Wstecz", ButtonOK_FG, ButtonOK_BG)//,
+    cButton(85, 205, 70, ButtonHeight, "<", ButtonOK_FG, ButtonOK_BG)//,
     //cButton(0, 30, ButtonWidth, ButtonHeight, "Alarm")
   };
   cEdit _e[2 * NO_OF_ALARMS] = {
@@ -96,7 +96,7 @@ void AlarmPage(TTGOClass *ttgo){
     cCheckbox(180, 145, ButtonWidth, ButtonHeight, Alarm_Active[2])
   };
   
-  AlarmPageDraw(ttgo, _b, _e, _c);
+  AlarmPageDraw(g, _b, _e, _c);
   
 
   do{s.Run(ttgo, millis()); } while(s.Swiping);
@@ -109,47 +109,47 @@ void AlarmPage(TTGOClass *ttgo){
     for(int i = 0; i < NO_OF_ALARMS; i++) _c[i].Run(ttgo, s);
 
     if(_e[0].IsReleased()){
-      getInput(ttgo, "Nazwa dla " + Alarm_Names[0], &Alarm_Names[0], 9, BPLUS_ALFA);
-      AlarmPageDraw(ttgo, _b, _e, _c);
+      getInput(g, "Nazwa dla " + Alarm_Names[0], &Alarm_Names[0], 9, BPLUS_ALFA);
+      AlarmPageDraw(g, _b, _e, _c);
     }
     if(_e[1].IsReleased()){
-      getInput(ttgo, "Nazwa dla " + Alarm_Names[1], &Alarm_Names[1], 9, BPLUS_ALFA);
-      AlarmPageDraw(ttgo, _b, _e, _c);
+      getInput(g, "Nazwa dla " + Alarm_Names[1], &Alarm_Names[1], 9, BPLUS_ALFA);
+      AlarmPageDraw(g, _b, _e, _c);
     }
     if(_e[2].IsReleased()){
-      getInput(ttgo, "Nazwa dla " + Alarm_Names[2], &Alarm_Names[2], 9, BPLUS_ALFA);
-      AlarmPageDraw(ttgo, _b, _e, _c);
+      getInput(g, "Nazwa dla " + Alarm_Names[2], &Alarm_Names[2], 9, BPLUS_ALFA);
+      AlarmPageDraw(g, _b, _e, _c);
     }
     
     if(_e[3].IsReleased()){
-      if(getInput(ttgo, "Czas dla " + Alarm_Names[0], &Sgodzina0, 5, BPLUS_HOUR)){
+      if(getInput(g, "Czas dla " + Alarm_Names[0], &Sgodzina0, 5, BPLUS_HOUR)){
         sscanf(Sgodzina0.c_str(), "%d:%d", &Alarm_hh[0], &Alarm_mm[0]);      
         sprintf(godzina0, "%d:%02d", Alarm_hh[0], Alarm_mm[0]);
         Sgodzina0 = String(godzina0);        
         Alarm_Active[0] = _c[0].Checked;
         TrySetNearestAlarm();
       }
-      AlarmPageDraw(ttgo, _b, _e, _c);
+      AlarmPageDraw(g, _b, _e, _c);
     }
     if(_e[4].IsReleased()){
-      if(getInput(ttgo, "Czas dla " + Alarm_Names[1], &Sgodzina1, 5, BPLUS_HOUR)){
+      if(getInput(g, "Czas dla " + Alarm_Names[1], &Sgodzina1, 5, BPLUS_HOUR)){
         sscanf(Sgodzina1.c_str(), "%d:%d", &Alarm_hh[1], &Alarm_mm[1]);        
         sprintf(godzina1, "%d:%02d", Alarm_hh[1], Alarm_mm[1]);
         Sgodzina1 = String(godzina1);
         Alarm_Active[1] = _c[1].Checked;
         TrySetNearestAlarm();
       }
-      AlarmPageDraw(ttgo, _b, _e, _c);
+      AlarmPageDraw(g, _b, _e, _c);
     }
     if(_e[5].IsReleased()){
-      if(getInput(ttgo, "Czas dla " + Alarm_Names[2], &Sgodzina2, 5, BPLUS_HOUR)){
+      if(getInput(g, "Czas dla " + Alarm_Names[2], &Sgodzina2, 5, BPLUS_HOUR)){
         sscanf(Sgodzina2.c_str(), "%d:%d", &Alarm_hh[2], &Alarm_mm[2]);        
         sprintf(godzina2, "%d:%02d", Alarm_hh[2], Alarm_mm[2]);
         Sgodzina2 = String(godzina2);
         Alarm_Active[2] = _c[2].Checked;
         TrySetNearestAlarm();
       }
-      AlarmPageDraw(ttgo, _b, _e, _c);
+      AlarmPageDraw(g, _b, _e, _c);
     }
 
 
@@ -161,5 +161,5 @@ void AlarmPage(TTGOClass *ttgo){
   } while(!_b[0].IsReleased());
 
   do{s.Run(ttgo, millis()); } while(s.Swiping);
-  ttgo->tft->fillScreen(TFT_BLACK); 
+  //ttgo->tft->fillScreen(TFT_BLACK); 
 }

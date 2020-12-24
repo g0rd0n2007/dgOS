@@ -4,46 +4,44 @@ String SecToTime(long int t){
     return String(buf);
 }
 
-void StoperPageDraw(TTGOClass *ttgo, cButton b[], long int ttime, int p, long int his[]){
-  if(p>=2){
-    ttgo->tft->fillScreen(TFT_BLACK); 
-  }
-  
-  
+void StoperPageDraw(TFT_eSprite *g, cButton b[], long int ttime, int p, long int his[]){
+  g->fillSprite(TFT_BLACK); 
+    
   //ttgo->tft->setTextDatum(TC_DATUM);   
-  ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-  ttgo->tft->setFreeFont(FSS18);
+  g->setTextColor(TFT_WHITE, TFT_BLACK);
+  g->setFreeFont(FSS18);
   //ttgo->tft->drawString("Alarm", 120, 10, GFXFF);*/
 
-  ttgo->tft->setTextDatum(TC_DATUM);
+  g->setTextDatum(TC_DATUM);
 
-  if(p>=0){ 
-    ttgo->tft->drawString(" " + SecToTime(ttime) + " ", 120, 10, GFXFF);
-    ttgo->tft->setFreeFont(FSS9);
-    if(his[0] >= 0) {
-      ttgo->tft->drawString(SecToTime(his[0]), 60, 90, GFXFF);
-    }
-    if(his[1] >= 0) {
-      ttgo->tft->drawString(SecToTime(his[1]), 60, 120, GFXFF);
-      ttgo->tft->drawString(SecToTime(his[0]-his[1]), 180, 90, GFXFF);
-    }
-    if(his[2] >= 0) {
-      ttgo->tft->drawString(SecToTime(his[2]), 60, 150, GFXFF);
-      ttgo->tft->drawString(SecToTime(his[1]-his[2]), 180, 120, GFXFF);
-    }
-    if(his[3] >= 0) {
-      ttgo->tft->drawString(SecToTime(his[3]), 60, 180, GFXFF);
-      ttgo->tft->drawString(SecToTime(his[2]-his[3]), 180, 150, GFXFF);
-    }
-    if(his[4] >= 0) {
+  g->drawString(SecToTime(ttime), 120, 10, GFXFF);
+  g->setFreeFont(FSS9);
+  if(his[0] >= 0) {
+      g->drawString(SecToTime(his[0]), 60, 90, GFXFF);
+  }
+  if(his[1] >= 0) {
+      g->drawString(SecToTime(his[1]), 60, 120, GFXFF);
+      g->drawString(SecToTime(his[0]-his[1]), 180, 90, GFXFF);
+  }
+  if(his[2] >= 0) {
+      g->drawString(SecToTime(his[2]), 60, 150, GFXFF);
+      g->drawString(SecToTime(his[1]-his[2]), 180, 120, GFXFF);
+  }
+  if(his[3] >= 0) {
+      g->drawString(SecToTime(his[3]), 60, 180, GFXFF);
+      g->drawString(SecToTime(his[2]-his[3]), 180, 150, GFXFF);
+  }
+  if(his[4] >= 0) {
       //ttgo->tft->drawString(SecToTime(his[4]), 60, 210, GFXFF);
-      ttgo->tft->drawString(SecToTime(his[3]-his[4]), 180, 180, GFXFF);
-    }
+      g->drawString(SecToTime(his[3]-his[4]), 180, 180, GFXFF);
   }
   
   
-  if(p>=1) for(int i = 0; i < 3; i++) b[i].Draw(ttgo, false);     
+  
+  for(int i = 0; i < 3; i++) b[i].Draw(g);     
   //for(int i = 0; i < 2; i++) e[i].Draw(ttgo, 2);  
+
+  g->pushSprite(0, 0);
 }
 
 
@@ -60,12 +58,12 @@ void StoperPage(TTGOClass *ttgo){
   RTC_Date _t = ttgo->rtc->getDateTime();
   
   cButton _b[3] = {
-    cButton(85, 205, 70, ButtonHeight, "Wstecz", ButtonOK_FG, ButtonOK_BG),
+    cButton(85, 205, 70, ButtonHeight, "<", ButtonOK_FG, ButtonOK_BG),
     cButton(30, 50, 70, ButtonHeight, "Start", ButtonOK_FG, ButtonOK_BG),
     cButton(140, 50, 70, ButtonHeight, "Pomiar", TFT_WHITE, 0x3016)
   };
       
-  StoperPageDraw(ttgo, _b, ttime, 2, his);
+  StoperPageDraw(g, _b, ttime, 2, his);
   /*ttgo->rtc->setTimer(64, 1, false);
   ttgo->rtc->disableCLK();
   ttgo->rtc->disableTimer();*/
@@ -87,7 +85,7 @@ void StoperPage(TTGOClass *ttgo){
       //ttgo->rtc->clearTimer();
       //ttgo->rtc->setTimer(64, 1, false);
       ttime++;
-      StoperPageDraw(ttgo, _b, ttime, 0, his);
+      StoperPageDraw(g, _b, ttime, 0, his);
     }
 
     if(_b[1].IsPressed()){
@@ -106,7 +104,7 @@ void StoperPage(TTGOClass *ttgo){
         _b[2].Text = "Reset";
         _b[2].BG = ButtonNo_BG;
       }
-      StoperPageDraw(ttgo, _b, ttime, 1, his);
+      StoperPageDraw(g, _b, ttime, 1, his);
       ttgo->motor->onec();
     }
     if(_b[2].IsPressed()){
@@ -119,11 +117,11 @@ void StoperPage(TTGOClass *ttgo){
       }else{
         ttime = 0;
       }
-      StoperPageDraw(ttgo, _b, ttime, 0, his);
+      StoperPageDraw(g, _b, ttime, 0, his);
     }
     
   } while(!_b[0].IsReleased());
 
   do{s.Run(ttgo, millis()); } while(s.Swiping);
-  ttgo->tft->fillScreen(TFT_BLACK); 
+  //ttgo->tft->fillScreen(TFT_BLACK); 
 }

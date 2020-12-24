@@ -1,23 +1,19 @@
-void TimerPageDraw(TTGOClass *ttgo, cButton b[], long int ttime, int p){
-  if(p>=2){
-    ttgo->tft->fillScreen(TFT_BLACK); 
-  }
+void TimerPageDraw(TFT_eSprite *g, cButton b[], long int ttime, int p){
+  g->fillSprite(TFT_BLACK); 
   
   
   //ttgo->tft->setTextDatum(TC_DATUM);   
-  ttgo->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-  ttgo->tft->setFreeFont(FSS18);
+  g->setTextColor(TFT_WHITE, TFT_BLACK);
+  g->setFreeFont(FSS18);
   //ttgo->tft->drawString("Alarm", 120, 10, GFXFF);*/
 
-  ttgo->tft->setTextDatum(TC_DATUM);
-
-  if(p>=0){ 
-    ttgo->tft->drawString(" " + SecToTime(ttime) + " ", 120, 10, GFXFF);
-    
-  }  
+  g->setTextDatum(TC_DATUM);
+  g->drawString(SecToTime(ttime), 120, 10, GFXFF);
   
-  if(p>=1) for(int i = 0; i < 3; i++) b[i].Draw(ttgo, false);     
+  for(int i = 0; i < 3; i++) b[i].Draw(g);     
   //for(int i = 0; i < 2; i++) e[i].Draw(ttgo, 2);  
+
+  g->pushSprite(0, 0);
 }
 
 
@@ -34,12 +30,12 @@ void TimerPage(TTGOClass *ttgo){
   RTC_Date _t = ttgo->rtc->getDateTime();
   
   cButton _b[3] = {
-    cButton(85, 205, 70, ButtonHeight, "Wstecz", ButtonOK_FG, ButtonOK_BG),
+    cButton(85, 205, 70, ButtonHeight, "<", ButtonOK_FG, ButtonOK_BG),
     cButton(30, 50, 70, ButtonHeight, "Start", ButtonOK_FG, ButtonOK_BG),
     cButton(140, 50, 70, ButtonHeight, "Ustaw", TFT_WHITE, 0x3016)
   };
       
-  TimerPageDraw(ttgo, _b, ttime, 2);
+  TimerPageDraw(g, _b, ttime, 2);
   /*ttgo->rtc->setTimer(64, 1, false);
   ttgo->rtc->disableCLK();
   ttgo->rtc->disableTimer();*/
@@ -60,7 +56,7 @@ void TimerPage(TTGOClass *ttgo){
     if(Running && last_s != _t.second){
       if(ttime > 0){
         ttime--;
-        TimerPageDraw(ttgo, _b, ttime, 0);
+        TimerPageDraw(g, _b, ttime, 0);
       }else{
         Timer alm_t, to;
         boolean bo = true;
@@ -82,7 +78,7 @@ void TimerPage(TTGOClass *ttgo){
         Running = false;        
         _b[1].Text = "Start";   
         _b[2].Text = "Ustaw"; 
-        TimerPageDraw(ttgo, _b, ttime, 1);
+        TimerPageDraw(g, _b, ttime, 1);
       }      
     }
 
@@ -100,7 +96,7 @@ void TimerPage(TTGOClass *ttgo){
         _b[1].Text = "Start";   
         _b[2].Text = "Ustaw";    
       }
-      TimerPageDraw(ttgo, _b, ttime, 1);
+      TimerPageDraw(g, _b, ttime, 1);
       ttgo->motor->onec();
     }
     if(_b[2].IsPressed()){
@@ -110,16 +106,16 @@ void TimerPage(TTGOClass *ttgo){
         String txt;
 
         txt=SecToTime(setpoint);
-        if(getInput(ttgo, "Ustawianie czasu", &txt, 8, BPLUS_HOUR) == Result_OK){
+        if(getInput(g, "Ustawianie czasu", &txt, 8, BPLUS_HOUR) == Result_OK){
           long int a, b, c;
           sscanf(txt.c_str(), "%ld:%ld:%ld", &a, &b, &c);
           ttime=setpoint=a*3600+b*60+c;
         }      
       }
-      TimerPageDraw(ttgo, _b, ttime, 1);
+      TimerPageDraw(g, _b, ttime, 1);
     }
   } while(!_b[0].IsReleased());
 
   do{s.Run(ttgo, millis()); } while(s.Swiping);
-  ttgo->tft->fillScreen(TFT_BLACK); 
+  //ttgo->tft->fillScreen(TFT_BLACK); 
 }

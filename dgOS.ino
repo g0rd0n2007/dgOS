@@ -51,7 +51,7 @@ boolean S_Timeout(Swipe *s, uint32_t t){
       sprintf(buf, "%d:%02d", hh, mm);
       a = String(buf);
       
-      if(getInput(ttgo, "Ustawianie godziny:", &a, 5, BPLUS_HOUR)){
+      if(getInput(g, "Ustawianie godziny:", &a, 5, BPLUS_HOUR)){
         sscanf(a.c_str(), "%d:%d", &hh, &mm);
         ttgo->rtc->setDateTime(yyear, mmonth, dday, hh, mm, 0);
       }
@@ -65,7 +65,7 @@ boolean S_Timeout(Swipe *s, uint32_t t){
       sprintf(buf, "%d/%d/%04d", dday, mmonth, yyear);
       a = String(buf);
 
-      if(getInput(ttgo, "Ustawianie daty:", &a, 10, BPLUS_DATE)){
+      if(getInput(g, "Ustawianie daty:", &a, 10, BPLUS_DATE)){
         sscanf(a.c_str(), "%d/%d/%d", &dday, &mmonth, &yyear);
         ttgo->rtc->setDateTime(yyear, mmonth, dday, hh, mm, ss);
       }

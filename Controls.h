@@ -216,7 +216,6 @@ public:
   }
   
   void Draw(TTGOClass *ttgo){
-    ttgo->tft->setTextDatum(MC_DATUM);  
     int r = Height / 2;
     const int a = 3;
     int r2 = (Height - 2 * a) / 2;
@@ -228,6 +227,22 @@ public:
       ttgo->tft->fillRoundRect(X + Width - Height + a, Y + a, Height - 2 * a, Height - 2 * a, r2, FG);       
     }else{
       ttgo->tft->fillRoundRect(X + a, Y + a, Height - 2 * a, Height - 2 * a, r2, FG); 
+    }   
+   
+  }
+
+  void Draw(TFT_eSprite *g){      
+    int r = Height / 2;
+    const int a = 3;
+    int r2 = (Height - 2 * a) / 2;
+
+    //ttgo->tft->fillRect(X, Y, Width, Height, TFT_BLACK);
+    g->fillRoundRect(X, Y, Width, Height, r, (Checked)? BG_ON : BG_OFF); 
+    g->drawRoundRect(X, Y, Width, Height, r, FG); 
+    if(Checked){      
+      g->fillRoundRect(X + Width - Height + a, Y + a, Height - 2 * a, Height - 2 * a, r2, FG);       
+    }else{
+      g->fillRoundRect(X + a, Y + a, Height - 2 * a, Height - 2 * a, r2, FG); 
     }   
    
   }
@@ -327,6 +342,28 @@ public:
     }else if(Blinks && !Cursor) {
       //ttgo->tft->drawFastHLine(X + 7 + w, Y + 4, 3, BG);
       ttgo->tft->drawFastVLine(X + 8 + w, Y + 5, Height - 10, BG);
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + Height - 5, 3, BG);
+    }
+  }
+
+  void Draw(TFT_eSprite *g){
+
+    g->setFreeFont(FSS9);
+    g->setTextDatum(ML_DATUM);
+      
+    g->setTextColor(FG, BG);      
+    g->fillRoundRect(X, Y, Width, Height, Height / 2, BG);
+    g->drawRoundRect(X, Y, Width, Height, Height / 2, FG);
+    g->drawString(*Text, X + 7, Y + Height / 2, GFXFF);
+    
+    int w = g->textWidth(*Text);
+    if(Blinks && Cursor) {
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + 4, 3, FG);
+      g->drawFastVLine(X + 8 + w, Y + 5, Height - 10, FG);
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + Height - 5, 3, FG);
+    }else if(Blinks && !Cursor) {
+      //ttgo->tft->drawFastHLine(X + 7 + w, Y + 4, 3, BG);
+      g->drawFastVLine(X + 8 + w, Y + 5, Height - 10, BG);
       //ttgo->tft->drawFastHLine(X + 7 + w, Y + Height - 5, 3, BG);
     }
   }
