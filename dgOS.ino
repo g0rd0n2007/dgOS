@@ -12,7 +12,10 @@ TFT_eSprite *g;
 Timer drawT, sleepT;
 uint32_t Now;
 boolean irqAPX202 = false, irqRTC = false, irqBMA = false;
+
 String SecToTime(long int t);
+void StepsMoveHistory(int s, bool shift);
+
 long int StepCount = 0;
 void ReadBMA_IRQ();
 
@@ -30,6 +33,7 @@ void ReadBMA_IRQ();
 #include "screen_page.h" 
 #include "stoper_page.h"
 #include "timer_page.h"
+#include "steps_page.h"
 #include "menu.h"
 
 
@@ -77,7 +81,7 @@ boolean S_Timeout(Swipe *s, uint32_t t){
   return false;
 }
 
-void DrawDesktop(){
+void DrawDesktop(bool push = true){
   
   
   //TFT_eSprite G(ttgo->tft);
@@ -98,7 +102,7 @@ void DrawDesktop(){
 
   
   //G.fillSprite(TFT_GREEN);
-  g->pushSprite(0, 0);
+  if(push) g->pushSprite(0, 0);
   //G.deleteSprite();  
 }
 
@@ -244,10 +248,78 @@ void loop()
       S.Run(ttgo, Now);
       cMenu.Run(g, S, Now);
 
+      if(S.Swiping && S.CatchInRect(0, 0, 240, TopBarHeight)){
+        int h;
+        do{
+          Now = millis();
+          S.Run(ttgo, Now);
+          h = S.Y - S.CatchY;
+
+          DrawDesktop(false);
+          g->fillRect(0, 0, 240, h, TFT_BLACK);
+          g->drawXBitmap(5, h - 16 - 5, alarmIcon, 16, 16, TFT_WHITE);
+          g->pushSprite(0, 0);
+        }while(S.Swiping);
+
+        if(h>60){//bedzie aktywne
+          if(h>120){
+            while(h>120){
+              DrawDesktop(false);
+              g->fillRect(0, 0, 240, h, TFT_BLACK);
+              g->drawXBitmap(5, h - 16 - 5, alarmIcon, 16, 16, TFT_WHITE);
+              g->pushSprite(0, 0);
+
+              h-=10;
+            }
+          }else{
+             while(h<120){
+              DrawDesktop(false);
+              g->fillRect(0, 0, 240, h, TFT_BLACK);
+              g->drawXBitmap(5, h - 16 - 5, alarmIcon, 16, 16, TFT_WHITE);
+              g->pushSprite(0, 0);
+
+              h+=10;
+            }
+          }
+
+          h = 120;
+          DrawDesktop(false);
+          g->fillRect(0, 0, 240, h, TFT_BLACK);
+          g->drawXBitmap(5, h - 16 - 5, alarmIcon, 16, 16, TFT_WHITE);
+          g->pushSprite(0, 0);
+
+          delay(1000);
+
+          while(h>0){
+            DrawDesktop(false);
+            g->fillRect(0, 0, 240, h, TFT_BLACK);
+            g->drawXBitmap(5, h - 16 - 5, alarmIcon, 16, 16, TFT_WHITE);
+            g->pushSprite(0, 0);
+
+            h-=10;
+          }
+        }else{
+          while(h>0){
+            DrawDesktop(false);
+            g->fillRect(0, 0, 240, h, TFT_BLACK);
+            g->drawXBitmap(5, h - 16 - 5, alarmIcon, 16, 16, TFT_WHITE);
+            g->pushSprite(0, 0);
+
+            h-=10;
+          }
+        }
+
+
+        DrawDesktop();
+        sleepT.SetNext(millis());
+      }
+
       if(cMenu.IsReleased()){
         Menu(ttgo);
         sleepT.SetNext(millis());
         drawT.TargetTime = 0;
+        irqAPX202 = false;
+        ttgo->power->clearIRQ();
       }
       
       if (drawT.TON(Now)) {
@@ -292,6 +364,9 @@ void loop()
       }
       ttgo->power->clearIRQ();      
     }
+
+
+    
     if(ttgo->rtc->alarmActive()){
       irqRTC = false;
       ttgo->rtc->resetAlarm();
@@ -354,7 +429,15 @@ void ReadBMA_IRQ(){
 
         // Check if it is a step interrupt
         if (ttgo->bma->isStepCounter()) {
+            RTC_Date tnow = ttgo->rtc->getDateTime();
+            if(tnow.day != dday){
+              StepsMoveHistory(StepCount, true);        
+              ttgo->bma->resetStepCounter();
+              dday = tnow.day;
+            }
+          
             // Get step data from register
-            StepCount = ttgo->bma->getCounter();            
+            StepCount = ttgo->bma->getCounter(); 
+            StepsMoveHistory(StepCount, false);            
         }
 }

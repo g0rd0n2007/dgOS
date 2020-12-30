@@ -22,7 +22,8 @@ enum ButtonState{
   BS_Idle = 0,
   BS_Pressed = 1,
   BS_Holded = 2,
-  BS_Released = 3
+  BS_Released = 3,
+  BS_Holded_Moved = 10
 };
 
 class cButton:cControl{
@@ -50,11 +51,12 @@ public:
     
     if(Pushed)  {
       ttgo->tft->setTextColor(TFT_BLACK, TFT_WHITE);
-      ttgo->tft->fillRoundRect(X, Y, Width, Height, Height / 2, TFT_WHITE);      
+      //ttgo->tft->fillRoundRect(X, Y, Width, Height, Height / 2, TFT_WHITE);    
+      ttgo->tft->fillRect(X, Y, Width, Height, TFT_WHITE);      
     }else {
       ttgo->tft->setTextColor(FG, BG);
-      ttgo->tft->fillRoundRect(X, Y, Width, Height, Height / 2, BG);
-      //ttgo->tft->drawRoundRect(X, Y, Width, Height, 5, FG);
+      //ttgo->tft->fillRoundRect(X, Y, Width, Height, Height / 2, BG);
+      ttgo->tft->fillRect(X, Y, Width, Height, BG);
     }
         
     ttgo->tft->setFreeFont(FSS9);
@@ -68,11 +70,14 @@ public:
 
     if(Pressed == BS_Pressed || Pressed == BS_Holded)  {
       g->setTextColor(TFT_BLACK, TFT_WHITE);
-      g->fillRoundRect(X, Y, Width, Height, Height / 2, TFT_WHITE);      
+      //g->fillRoundRect(X, Y, Width, Height, Height / 2, TFT_WHITE); 
+      g->fillRect(X, Y, Width, Height, TFT_WHITE);        
     }else {
       g->setTextColor(FG, BG);
-      if(FG != BG) g->fillRoundRect(X, Y, Width, Height, 15, BG);
-      else g->drawRoundRect(X, Y, Width, Height, Height / 2, FG);
+      //if(FG != BG) g->fillRoundRect(X, Y, Width, Height, 15, BG);
+      //else g->drawRoundRect(X, Y, Width, Height, Height / 2, FG);
+      if(FG != BG) g->fillRect(X, Y, Width, Height, BG);
+      else g->drawRect(X, Y, Width, Height, FG);
     }
         
     g->setFreeFont(FSS9);
@@ -271,6 +276,30 @@ public:
     }    
   }
 
+  void Run(TFT_eSprite *g, Swipe s){
+    switch(Pressed){
+      case BS_Idle:
+        if(s.Swiping && s.CatchInRect(X, Y, Width, Height)) { 
+          Pressed = BS_Pressed;  
+          Checked = !Checked;
+        }
+        break;
+      case BS_Pressed:
+        Pressed = BS_Holded;
+        break;
+      case BS_Holded:
+        if(!s.Swiping) {
+          Pressed = BS_Released;
+        }
+        break;
+      case BS_Released:        
+        Pressed = BS_Idle;
+        Draw(g);
+        g->pushSprite(0, 0);
+        break;
+    }    
+  }
+
   boolean IsIdle(){
     if(Pressed == BS_Idle) return true;
     else return false;
@@ -283,6 +312,154 @@ public:
 
   boolean IsHolded(){
     if(Pressed == BS_Holded) return true;
+    else return false;
+  }
+
+  boolean IsReleased(){
+    if(Pressed == BS_Released) return true;
+    else return false;
+  }
+};
+
+
+
+
+
+
+
+
+class cSlider:cControl{
+private:
+  ButtonState Pressed = BS_Idle;
+  
+public:
+  int Min, Max, Value;
+  uint16_t FG = Checkbox_FG, BG = CheckboxOFF_BG;
+    
+  cSlider(){};
+
+  cSlider(int16_t x, int16_t y, int16_t w, int16_t h, int _min, int v, int _max){
+    X = x; Y = y; Width = w; Height = h; Min = _min; Value = v; Max = _max;
+  }
+
+  cSlider(int16_t x, int16_t y, int16_t w, int16_t h, int _min, int v, int _max, uint16_t fg, uint16_t bg){
+    X = x; Y = y; Width = w; Height = h; Min = _min; Value = v; Max = _max; FG = fg; BG = bg;
+  }
+  
+  /*void Draw(TTGOClass *ttgo){
+    int r = Height / 2;
+    const int a = 3;
+    int r2 = (Height - 2 * a) / 2;
+
+    //ttgo->tft->fillRect(X, Y, Width, Height, TFT_BLACK);
+    ttgo->tft->fillRoundRect(X, Y, Width, Height, r, (Checked)? BG_ON : BG_OFF); 
+    ttgo->tft->drawRoundRect(X, Y, Width, Height, r, FG); 
+    if(Checked){      
+      ttgo->tft->fillRoundRect(X + Width - Height + a, Y + a, Height - 2 * a, Height - 2 * a, r2, FG);       
+    }else{
+      ttgo->tft->fillRoundRect(X + a, Y + a, Height - 2 * a, Height - 2 * a, r2, FG); 
+    }   
+   
+  }*/
+
+  void CalcValue(int swipe_x){
+    int r = Height / 2;
+    const int a = 3;
+    int r2 = (Height - 2 * a) / 2, x;
+    
+    Value = constrain(
+      ((Width - (2 * a) - (Height - 2 * a)) * ((swipe_x - a - X) - Min)) / (Max - Min),
+      Min,
+      Max
+    );
+  }
+
+  void Draw(TFT_eSprite *g){      
+    int r = Height / 2;
+    const int a = 3;
+    int r2 = (Height - 2 * a) / 2, x;
+
+    //ttgo->tft->fillRect(X, Y, Width, Height, TFT_BLACK);
+    g->fillRoundRect(X, Y, Width, Height, r, BG); 
+    g->drawRoundRect(X, Y, Width, Height, r, FG); 
+
+    x = ((Width - (2 * a) - (Height - 2 * a)) * (Value - Min)) / (Max - Min);
+    g->fillRoundRect(X + a + x, Y + a, Height - 2 * a, Height - 2 * a, r2, FG);
+   
+  }
+
+  /*void Run(TTGOClass *ttgo, Swipe s){
+    switch(Pressed){
+      case BS_Idle:
+        if(s.Swiping && s.CatchInRect(X, Y, Width, Height)) { 
+          Pressed = BS_Pressed;  
+          Checked = !Checked;
+        }
+        break;
+      case BS_Pressed:
+        Pressed = BS_Holded;
+        break;
+      case BS_Holded:
+        if(!s.Swiping) {
+          Pressed = BS_Released;
+          //Draw(ttgo, false);
+        }
+        break;
+      case BS_Released:        
+        Pressed = BS_Idle;
+        //Draw(ttgo);
+        break;
+    }    
+  }*/
+
+  void Run(TFT_eSprite *g, Swipe s){
+    switch(Pressed){
+      case BS_Idle:
+        if(s.Swiping && s.CatchInRect(X, Y, Width, Height)) { 
+          Pressed = BS_Pressed;  
+        }
+        break;
+      case BS_Pressed:
+        Pressed = BS_Holded;
+        break;
+      case BS_Holded:
+        if(s.Swiping){
+          if(s.SwipingMove()){
+            Pressed = BS_Holded_Moved;            
+          }          
+        }else{
+          Pressed = BS_Released;
+        }
+        break;
+      case BS_Holded_Moved:
+        CalcValue(s.X);
+        Draw(g);
+        g->pushSprite(0, 0);
+        Pressed = BS_Holded;
+        break;
+      case BS_Released:        
+        Pressed = BS_Idle;       
+        break;
+    }    
+  }
+
+  boolean IsIdle(){
+    if(Pressed == BS_Idle) return true;
+    else return false;
+  }
+
+  boolean IsPressed(){
+    if(Pressed == BS_Pressed) return true;
+    else return false;
+  }
+
+  boolean IsHolded(){
+    if(Pressed == BS_Holded) return true;
+    else return false;
+  }
+
+  boolean IsHoldedMoved(){
+    if(Pressed == BS_Holded_Moved) return true;
     else return false;
   }
 
@@ -372,6 +549,32 @@ public:
     if(CT.TON(t, true)){
       Cursor = !Cursor;
       Draw(ttgo, 1);
+    }
+    
+    switch(Pressed){
+      case BS_Idle:
+        if(s.Swiping && s.CatchInRect(X, Y, Width, Height)) { 
+          Pressed = BS_Pressed; 
+        }
+        break;
+      case BS_Pressed:
+        Pressed = BS_Holded;
+        break;
+      case BS_Holded:
+        if(!s.Swiping) {
+          Pressed = BS_Released;
+        }
+        break;
+      case BS_Released:
+        Pressed = BS_Idle;
+        break;
+    }    
+  }
+
+  void Run(TFT_eSprite *g, Swipe s, uint32_t t){
+    if(CT.TON(t, true)){
+      Cursor = !Cursor;
+      Draw(g);
     }
     
     switch(Pressed){

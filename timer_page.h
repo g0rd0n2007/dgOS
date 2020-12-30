@@ -47,7 +47,7 @@ void TimerPage(TTGOClass *ttgo){
   do{
     now = millis();
     s.Run(ttgo, now);
-    for(int i = 0; i < 3; i++) _b[i].Run(ttgo, s, now); 
+    for(int i = 0; i < 3; i++) _b[i].Run(g, s, now); 
     //for(int i = 0; i < 2; i++) _e[i].Run(ttgo, s, now); 
 
     last_s = _t.second;

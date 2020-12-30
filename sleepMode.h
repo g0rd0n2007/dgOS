@@ -68,13 +68,7 @@ void ShutDown(){
 
     while(!irqAPX202 && !irqRTC){
       esp_light_sleep_start();
-
-      RTC_Date tnow = ttgo->rtc->getDateTime();
-      if(tnow.day != dday){
-        ttgo->bma->resetStepCounter();
-        dday = tnow.day;
-      }
-
+      
       if(irqBMA){
         ReadBMA_IRQ();
       }

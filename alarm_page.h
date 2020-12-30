@@ -104,21 +104,24 @@ void AlarmPage(TTGOClass *ttgo){
   do{
     now = millis();
     s.Run(ttgo, now);
-    for(int i = 0; i < 1; i++) _b[i].Run(ttgo, s, now);
-    for(int i = 0; i < (2 * NO_OF_ALARMS); i++) _e[i].Run(ttgo, s, now);
-    for(int i = 0; i < NO_OF_ALARMS; i++) _c[i].Run(ttgo, s);
+    for(int i = 0; i < 1; i++) _b[i].Run(g, s, now);
+    for(int i = 0; i < (2 * NO_OF_ALARMS); i++) _e[i].Run(g, s, now);
+    for(int i = 0; i < NO_OF_ALARMS; i++) _c[i].Run(g, s);
 
     if(_e[0].IsReleased()){
       getInput(g, "Nazwa dla " + Alarm_Names[0], &Alarm_Names[0], 9, BPLUS_ALFA);
       AlarmPageDraw(g, _b, _e, _c);
+      TrySetNearestAlarm();
     }
     if(_e[1].IsReleased()){
       getInput(g, "Nazwa dla " + Alarm_Names[1], &Alarm_Names[1], 9, BPLUS_ALFA);
       AlarmPageDraw(g, _b, _e, _c);
+      TrySetNearestAlarm();
     }
     if(_e[2].IsReleased()){
       getInput(g, "Nazwa dla " + Alarm_Names[2], &Alarm_Names[2], 9, BPLUS_ALFA);
       AlarmPageDraw(g, _b, _e, _c);
+      TrySetNearestAlarm();
     }
     
     if(_e[3].IsReleased()){
